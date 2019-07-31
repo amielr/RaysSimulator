@@ -17,7 +17,6 @@ from scipy.linalg import circulant
 from scipy.interpolate import griddata
 #from sympy.physics.optics import RayTransferMatrix, ThinLens
 #from sympy import Plane, Point3D,Line3D
-#from sympy.abc import x
 from itertools import chain
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits import mplot3d
