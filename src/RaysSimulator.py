@@ -72,7 +72,7 @@ def inputfunction():
     #print(x)
     #print(y)
 
-    a = 1
+    a = 2
     b = 1
     N = 1
     kx = 1
