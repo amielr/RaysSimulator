@@ -23,12 +23,16 @@ def non_zero_random():
 
 class MirrorPopulation:
     _population = []
+    _best = MirrorCreature()
 
     def __init__(self):
         self._population = [MirrorCreature() for x in range(config["population_size"])]
 
     def simulate(self):
         [mirror.simulate() for mirror in self._population]
+
+    def get_best(self):
+        return self._best
 
     def natural_select(self):
         selected = non_zero_random()
@@ -61,6 +65,7 @@ class MirrorPopulation:
          for index, mirror in enumerate(best_population)]
 
         self._population = best_population
+        self._best = best_population[0]
 
     def next_generation(self):
         self.set_picked_probability()
