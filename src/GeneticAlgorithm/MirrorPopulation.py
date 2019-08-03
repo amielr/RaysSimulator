@@ -9,7 +9,7 @@ with open('config.json') as config_file:
 
 def crossover(dna1, dna2):
     dna = dna1
-    dna = [dna[i] + x for i, x in enumerate(dna2)]
+    dna = [int((dna[i] + x) / 2) for i, x in enumerate(dna2)]
     return dna
 
 
