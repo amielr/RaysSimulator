@@ -2,3 +2,5 @@
 \.idea/
 
 src/__pycache__/
+
+src/GeneticAlgorithm/__pycache__/
