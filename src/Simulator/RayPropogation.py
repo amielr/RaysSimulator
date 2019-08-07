@@ -1,6 +1,9 @@
-from src.MirrorIntersectionFunctions import *
+from src.Simulator.MirrorIntersectionFunctions import *
 import numpy as np
 import time
+import json
+with open('Simulator/config.json') as config_file:
+    config = json.load(config_file)
 
 
 def line_plane_collision(planeNormal, planePoint, rayDirection, rayPoint, epsilon=1e-6):
@@ -91,7 +94,7 @@ def build_intersections_with_mirror(rayBundle, mirrorInterpolator, mirrorFunctio
         tb = time.time()
         twb = time.time()
 
-        allRaysFromLine = np.stack((allRaysFromLine[0], allRaysFromLine[1], allRaysFromLine[2], allRaysFromLine[3],
+        allRaysFromLine = np.stack((allRaysFromLine[config["rayAmplitudeValue"]], allRaysFromLine[1], allRaysFromLine[2], allRaysFromLine[3],
                                     allRaysFromLine[4], allRaysFromLine[5],
                                     allRaysFromLine[6], allRaysFromLine[4], allRaysFromLine[5], allRaysFromLine[5],
                                     allRaysFromLine[4], allRaysFromLine[5], allRaysFromLine[5], allRaysFromLine[5]))

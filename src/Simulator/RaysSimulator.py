@@ -1,17 +1,11 @@
-import numpy as np
+from src.Simulator.FunctionSources import light_source_function, screen_function, create_interpolated_mirror
+from src.Simulator.PlotFunctions import *
+from src.Simulator.WignerFunction import wignerize_each_function
+from src.Simulator.RayPropogation import *
+import json
 
-from numpy import linalg as LA
-
-
-import time
-from scipy import interpolate
-from scipy.fftpack import fft
-import math
-from scipy.linalg import circulant
-from src.FunctionSources import light_source_function, screen_function, create_interpolated_mirror
-from src.PlotFunctions import *
-from src.WignerFunction import wignerize_each_function
-from src.RayPropogation import *
+with open('Simulator/config.json') as config_file:
+    config = json.load(config_file)
 
 
 def integrate_intensity_wig(wignerobject, functionobject):
@@ -26,19 +20,6 @@ def integrate_intensity_wig(wignerobject, functionobject):
     uniquex, uniquexloc = np.unique(xr, return_inverse='true')
     uniquey, uniqueyloc = np.unique(yr, return_inverse='true')
 
-    # print("xr")
-    # print(xr)
-    # print("uniquex")
-    # print(uniquex)
-    # print("uniquexloc")
-    # print(uniquexloc)
-    # print("wignerobjectspace")
-    # print(wignerobject[0][2][1])
-
-    # print("length of x")
-    # print(len(xr))
-    # print("length of wvd")
-    # print(len(wignerobject[0]))
 
     # sumvec = []
     mapping = {}
@@ -192,11 +173,6 @@ def view_vectors(raysobject):
 
     return
 
-
-def get_ray_focal_points(raysobject):
-    return
-
-
 def get_vector(raysobject):
     rayobjectreturn = []
     for rayholder in raysobject:  # for each function row of rays
@@ -214,11 +190,6 @@ def get_vector(raysobject):
             # print("iteration number",i)
             normal = np.array([rayholder[6][i], rayholder[7][i], rayholder[8][i]])
 
-            # r = d−2(d⋅n)n
-
-            # rayholder[10][i] =
-            # rayholder[11][i] =
-            # rayholder[12][i] =
     return rayobjectreturn
 
 
@@ -262,16 +233,6 @@ def error_value_calc(raysobject, actualoutputfunction):
     averagedistance = np.mean(averagedist)
     print("the average precision: " + str(averagedistance))
 
-    #        print(average_precision_score(ytrue.flatten(), rayholder[15].flatten()))
-    #     for i in range(len(rayholder[0])):          # run through all elements along array
-    #         #print("iteration number",i)
-    #         #print("new iteration through rayholder", i)
-    #         mx = idealx-rayholder[14][i]
-    #         ny = idealy-rayholder[15][i]
-    #         oz = idealz-rayholder[16][i]
-    #
-    # print("rayholder after")
-    # #print(rayobjectreturn)
     return 0
 
 
