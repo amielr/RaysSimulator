@@ -1,0 +1,5 @@
+{
+  "population_size": 1000,
+  "best_percent": 0.1,
+  "mutation_rate": 0.01
+}

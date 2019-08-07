@@ -2,3 +2,8 @@
 \.idea/
 
 src/__pycache__/
+<<<<<<< HEAD
+=======
+
+src/GeneticAlgorithm/__pycache__/
+>>>>>>> CR_Fix
