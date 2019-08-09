@@ -58,10 +58,8 @@ def iterate_till_error_reached(error, mirror_interp, vectorProperties):
 
     zint = mirror_interp(xCheckLocation, yCheckLocation)
     while checkValue > error:
-        # tsb = time.time()
         zray = zPoint + zDirection * checkpoint
 
-        # print(zint,zray,error)
         if zray < zint:
             bottom = bottom + delta
             delta = (top - bottom) / 2
@@ -108,7 +106,6 @@ def planes_of_mirror_intersections(allRaysFromLine, rayNumber, mirrorInterpolato
     p3x = x - dx
     p3y = y - dy
 
-    # z = mirrorInterpolator(x, y)
     p1z = mirrorInterpolator(p1x, p1y)  # get equivelant z points of interpelation points
     p2z = mirrorInterpolator(p2x, p2y)
     p3z = mirrorInterpolator(p3x, p3y)
@@ -116,20 +113,10 @@ def planes_of_mirror_intersections(allRaysFromLine, rayNumber, mirrorInterpolato
     p1 = np.array([p1x, p1y, float(p1z)])
     p2 = np.array([p2x, p2y, float(p2z)])
     p3 = np.array([p3x, p3y, float(p3z)])
-    # print(p1,p2,p3)
-    # These two vectors are in the plane
     v1 = p3 - p1
     v2 = p2 - p1
-    # the cross product is a vector normal to the plane
     cp = np.cross(v2, v1)
-
-    # print("the normal vector and its normalized version")
-    # print(cp)
     cp = cp / LA.norm(cp)
-    # print("our normal vector is")
-    # print(cp)
-
-    a, b, c = cp
     return cp
 
 
@@ -155,14 +142,9 @@ def reflected_vector_from_mirror(allRaysFromLine, rayNumber):
     n = np.array([allRaysFromLine[7][rayNumber], allRaysFromLine[8][rayNumber], allRaysFromLine[9][rayNumber]])
 
     ndot = dot_product(d, n)
-    # print(ndot)
     r = d - 2 * (ndot * n)
-    # print(r)
-    # print("the reflected vector is")
-    # print(r)
     r = r / LA.norm(r)
     r = r * 100
-    # print(r)
 
     allRaysFromLine[11][rayNumber] = r[0]
     allRaysFromLine[12][rayNumber] = r[1]

@@ -7,3 +7,5 @@ src/__pycache__/
 
 src/GeneticAlgorithm/__pycache__/
 >>>>>>> CR_Fix
+
+src/Simulator/__pycache__/

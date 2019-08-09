@@ -1,44 +1,51 @@
 import numpy as np
 from scipy import interpolate
 import math
-from numpy import sin, cos
 import json
-with open('Simulator/config.json') as config_file:
+
+with open('config.json') as config_file:
     config = json.load(config_file)
 
 
-def rotation_matrices(theta, direction):
-    Rx = [[1, 0, 0], [0, np.cos(theta), -np.sin(theta)], [0, np.sin(theta), np.cos(theta)]]
-    Ry = [[cos(theta), 0, sin(theta)], [0, 1, 0], [-sin(theta), 0, cos(theta)]]
-    Rz = [[cos(theta), -sin(theta), 0], [sin(theta), cos(theta), 0], [0, 0, 1]]
+def rotation_matrices(angle, direction):
+    angleInRadians = np.deg2rad(angle)
+    angleSin = np.sin(angleInRadians)
+    angleCos = np.cos(angleInRadians)
 
     if direction == 'x':
-        Rreturn = Rx
-    elif direction == 'y':
-        Rreturn = Ry
-    else:
-        Rreturn = Rz
+        return [
+            [1, 0, 0],
+            [0, angleCos, -angleSin],
+            [0, angleSin, angleCos]
+        ]
 
-    return Rreturn
+    if direction == 'y':
+        return [
+            [angleCos, 0, angleSin],
+            [0, 1, 0],
+            [-angleSin, 0, angleCos]
+        ]
+
+    return [
+        [angleCos, -angleSin, 0],
+        [angleSin, angleCos, 0],
+        [0, 0, 1]
+    ]
 
 
 def rotate(x, y, z, angle, direction):
-    ravelx = np.ravel(x)  # ravel the X matrix to become 1D
-    ravely = np.ravel(y)  # ravel the Y matrix to become 1D
-    ravelz = np.ravel(z)
-    XYZ = np.stack((ravelx, ravely, ravelz))  # stack the two 1D matrices and create a 2xN matrix X and then Y
-    # print(XY.shape)
+    flattenX, flattenY, flattenZ = np.ravel(x), np.ravel(y), np.ravel(z)
+    XYZ = np.stack((flattenX, flattenY, flattenZ))
 
     radian = math.radians(angle)
-    transfravelxyz = np.matmul(rotation_matrices(radian, direction),
-                               XYZ)  # multiply matrix 2x2 raymatrix by 2xN xy matrix
-    # print(transfravelxy.shape)
 
-    xtransfered = transfravelxyz[0]  # unstack into X and Y
+    transfravelxyz = np.matmul(rotation_matrices(radian, direction), XYZ)
+
+    xtransfered = transfravelxyz[0]
     ytransfered = transfravelxyz[1]
     ztransfered = transfravelxyz[2]
 
-    xtransfered = np.reshape(xtransfered, x.shape)  # reshape to original state
+    xtransfered = np.reshape(xtransfered, x.shape)
     ytransfered = np.reshape(ytransfered, y.shape)
     ztransfered = np.reshape(ztransfered, z.shape)
 
@@ -46,20 +53,12 @@ def rotate(x, y, z, angle, direction):
 
 
 def light_source_function():
-    x, y = np.meshgrid(np.linspace(-10, 10, config["lightSourceDensity"]), np.linspace(-10, 10, config["lightSourceDensity"]))     # function space and parameters
-    twodsquarewave = np.where(abs(x) <= 4, 1, 0) & np.where(abs(y) <= 3, 1, 0)
+    x, y = np.meshgrid(np.linspace(-10, 10, config["lightSourceDensity"]),
+                       np.linspace(-10, 10, config["lightSourceDensity"]))
 
-    # print("x function dimension is")
-    # print(x.shape)
-    # print("y function dimension is")
-    # print(y.shape)
+    pulse2d = np.where(abs(x) <= 4, 1, 0) & np.where(abs(y) <= 3, 1, 0)
 
-    raveledx, raveledy, raveledfunc = np.ravel(x), np.ravel(y), np.ravel(twodsquarewave)
-    xdimension, ydimension = twodsquarewave.shape[0], twodsquarewave.shape[1]
-    functiondata = np.stack((raveledx, raveledy, raveledfunc))
-    reshapedfunctiondata = np.reshape(functiondata, (3, xdimension, ydimension))
-
-    return reshapedfunctiondata  # x, z , amplitude
+    return np.stack((x, y, pulse2d))
 
 
 def screen_function():
