@@ -78,9 +78,9 @@ def build_ray_matrices_from_wigner(wignertransform, translatedwignertransform, f
 
 def build_intersections_with_mirror(rayBundle, mirrorInterpolator, mirrorFunction):
     rayObjectReturn = []
-    errorValue = 0.1
+    errorValue = config["mirrorErrorValue"]
     print("raybundle shape")
-    print(np.shape(rayBundle))
+    #print(np.shape(rayBundle))
     mirrorBorders = max_min(mirrorFunction)
 
     tb = time.time()
@@ -89,13 +89,13 @@ def build_intersections_with_mirror(rayBundle, mirrorInterpolator, mirrorFunctio
         removeelements = []
 
         print("rayholder before")
-        print(ta - tb)
-        print(np.shape(allRaysFromLine))
+        #print(ta - tb)
+        #print(np.shape(allRaysFromLine))
         tb = time.time()
         twb = time.time()
 
-        allRaysFromLine = np.stack((allRaysFromLine[config["rayAmplitudeValue"]], allRaysFromLine[1], allRaysFromLine[2], allRaysFromLine[3],
-                                    allRaysFromLine[4], allRaysFromLine[5],
+        allRaysFromLine = np.stack((allRaysFromLine[config["rayAmplitudeValue"]], allRaysFromLine[1], allRaysFromLine[2]
+                                    , allRaysFromLine[3], allRaysFromLine[4], allRaysFromLine[5],
                                     allRaysFromLine[6], allRaysFromLine[4], allRaysFromLine[5], allRaysFromLine[5],
                                     allRaysFromLine[4], allRaysFromLine[5], allRaysFromLine[5], allRaysFromLine[5]))
 
@@ -149,8 +149,8 @@ def build_intersections_with_screen(raysobject):
              # 1* Amplitude     # 3* spatial origins of ray, 3* intersection point on mirror
              rayholder[7], rayholder[8], rayholder[9], rayholder[10]
              # 3* normal of the surface  1* angle between
-             , rayholder[11], rayholder[12], rayholder[13]  # 3* reflected rays
-             , rayholder[11], rayholder[12], rayholder[13],))  # 3* intersection points with screen
+             , rayholder[11], rayholder[12], rayholder[13],  # 3* reflected rays
+                rayholder[11], rayholder[12], rayholder[13],))  # 3* intersection points with screen
         for i in range(len(rayholder[0])):  # run through all elements along array
             # print("iteration number",i)
             mx = rayholder[11][i]  # - rayholder[4][i]
@@ -180,14 +180,14 @@ def ray_propogation(zwignerobject, zwignerobjecttrans, lightsource, mirrorInterp
     rayBundle = build_ray_matrices_from_wigner(zwignerobject, zwignerobjecttrans, lightsource)
 
     print("in the main after matrix built")
-    print(np.shape(rayBundle))
+    # print(np.shape(rayBundle))
 
     rayBundle = build_intersections_with_mirror(rayBundle, mirrorInterpolator, mirrorobject)
 
     print("in the main, the rayobject size is")
     print(rayBundle[0].shape)
 
-    screenobject, screeninterp = screen_function()
+    # screenobject, screeninterp = screen_function()
 
     rayBundle = build_intersections_with_screen(rayBundle)
     return rayBundle

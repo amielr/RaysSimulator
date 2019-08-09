@@ -2,6 +2,9 @@ import numpy as np
 from scipy import interpolate
 import math
 from numpy import sin, cos
+import json
+with open('Simulator/config.json') as config_file:
+    config = json.load(config_file)
 
 
 def rotation_matrices(theta, direction):
@@ -35,15 +38,15 @@ def rotate(x, y, z, angle, direction):
     ytransfered = transfravelxyz[1]
     ztransfered = transfravelxyz[2]
 
-    xtransfered = np.reshape(xtransfered, (x.shape))  # reshape to original state
-    ytransfered = np.reshape(ytransfered, (y.shape))
-    ztransfered = np.reshape(ztransfered, (z.shape))
+    xtransfered = np.reshape(xtransfered, x.shape)  # reshape to original state
+    ytransfered = np.reshape(ytransfered, y.shape)
+    ztransfered = np.reshape(ztransfered, z.shape)
 
-    return (xtransfered, ytransfered, ztransfered)
+    return xtransfered, ytransfered, ztransfered
 
 
 def light_source_function():
-    x, y = np.meshgrid(np.linspace(-10, 10, 11), np.linspace(-10, 10, 11))     # function space and parameters
+    x, y = np.meshgrid(np.linspace(-10, 10, config["lightSourceDensity"]), np.linspace(-10, 10, config["lightSourceDensity"]))     # function space and parameters
     twodsquarewave = np.where(abs(x) <= 4, 1, 0) & np.where(abs(y) <= 3, 1, 0)
 
     # print("x function dimension is")

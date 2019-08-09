@@ -12,17 +12,17 @@ def integrate_intensity_wig(wignerobject, functionobject):
     print("we are in integrate function our x shape is")
     print(functionobject[0].shape)
     # print(x)
-    wvdr = np.ravel(wignerobject)
-    xr = np.ravel(functionobject[0])
+    # wvdr = np.ravel(wignerobject)
+    # xr = np.ravel(functionobject[0])
     yr = np.ravel(functionobject[1])
     xr = np.ravel(wignerobject[0][2][1])
 
-    uniquex, uniquexloc = np.unique(xr, return_inverse='true')
-    uniquey, uniqueyloc = np.unique(yr, return_inverse='true')
+    uniquex, uniquexloc = np.unique(xr, return_inverse=True)
+    uniquey, uniqueyloc = np.unique(yr, return_inverse=True)
 
 
-    # sumvec = []
-    mapping = {}
+
+    # mapping = {}
     functionreturn = []
 
     for x in range(0, len(wignerobject)):  # for rows and columns
@@ -80,7 +80,7 @@ def integrate_intensity_wig(wignerobject, functionobject):
     print(len(functionreturn))
     print(functionreturn[0].shape)
 
-    print(functionreturn[15])
+    # print(functionreturn[15])
     # print(transformedwigner.shape)
 
     X, Y, Z = np.empty(0, float), np.empty(0, float), np.empty(0, float)
@@ -107,10 +107,6 @@ def integrate_intensity_wig(wignerobject, functionobject):
     return functionobjectreturn
 
 
-def projection(source, mirrorloc, mirrorfunction):
-    return source
-
-
 def get_threshold_locations(function):  # create matrix where the value of function in each row is above the threshold
     rows = np.where(function.any(axis=1))  # rows
     columns = np.where(function.any(axis=0))  # columns
@@ -119,13 +115,9 @@ def get_threshold_locations(function):  # create matrix where the value of funct
     return rowscolumns
 
 
-def ray_transforms(wignerobject, dist):
-    # nrows, ncolumns = wvd.shape
+def ray_translated(wignerobject, dist):
 
-    refl = -2 / 1000
     shearmatrix = np.array([[1, dist], [0, 1]])
-    # shearmatrix = np.array([[1,0],[refl,1]])
-    # transformedwigner = []
     transformedwigner = np.empty(wignerobject.shape)
 
     for x in range(0, len(wignerobject)):  # for rows and columns
@@ -250,7 +242,7 @@ def deray_and_rebuild_xwigner(raysobject, wignerobject):
              # 3* normal of the surface  1* angle between
              , rayholder[11], rayholder[12], rayholder[13]  # 3* reflected rays
              , rayholder[14], rayholder[15], rayholder[
-                 16],))  # 3* intersection points with screen                                                                                   #
+                 16],))  # 3* intersection points with screen
 
         # print("rayholder shape is:")
         # print(rayholder.shape)
@@ -300,19 +292,17 @@ lightsource = light_source_function()  # returns x , y and the Function value/am
 
 # plot3dto2d(functionobject[0],functionobject[1],functionobject[2])   #xyz of function input
 
-zwignerfunction = wignerize_each_function(lightsource)  # wigner amp, space, frequency
+zwignerFunction = wignerize_each_function(lightsource)  # wigner amp, space, frequency
 
 # wignerobject = abs(wignerobject)
 
-plot_3d_to_2d(zwignerfunction[0][5][1], zwignerfunction[0][5][2], zwignerfunction[0][5][0])  # pass in space, phase and wigner amplitude
+zwignerTranslatedFunction = ray_translated(zwignerFunction, 50)
 
-zwignertransformedfunction = ray_transforms(zwignerfunction, 50)
-
-# plot3dto2d(wignerobjecttrans[0][5][1],wignerobjecttrans[0][5][2],wignerobjecttrans[0][5][0])   #pass in space, phase and wigner
-reversefunction = integrate_intensity_wig(zwignerfunction, lightsource)
+# plot_3d_to_2d(zwignerTranslatedFunction[0][5][1], zwignerTranslatedFunction[0][5][2], zwignerTranslatedFunction[0][5][0])
+reversefunction = integrate_intensity_wig(zwignerFunction, lightsource)
 plot_gridata(reversefunction)
 
-rayobject = ray_propogation(zwignerfunction, zwignertransformedfunction, lightsource, mirrorinterpolator, mirrorfunction, screen_function)
+rayobject = ray_propogation(zwignerFunction, zwignerTranslatedFunction, lightsource, mirrorinterpolator, mirrorfunction, screen_function)
 
 error_value_calc(rayobject, 0)
 
@@ -322,6 +312,13 @@ print(len(rayobject[3]))
 
 # plot3dto2d(screenobject[0],screenobject[1],screenobject[2])
 # plot3dto2d(mirrorobject[0],mirrorobject[1],mirrorobject[2])
+
+midPoint = int(config["lightSourceDensity"])
+midPoint = midPoint//2
+print(midPoint)
+
+plot_3d_to_2d(zwignerFunction[0][midPoint][1], zwignerFunction[0][midPoint][2], zwignerFunction[0][midPoint][0])  # pass in space, phase and wigner amplitude
+
 
 plot_scatter(rayobject, 14, 15, 16)  # plot the locations where the reflected rays hit the screen
 # plotscatter(rayobject,4,5,6)   #plot the locations where the reflected rays hit the screen

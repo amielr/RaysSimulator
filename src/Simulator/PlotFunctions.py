@@ -111,11 +111,6 @@ def plot_scatter(raysobject, a, b, c):
             vector = np.array([mx, ny, oz])
             # print(vector)
 
-    # print("Hello plot points")
-    # print(X)
-    # print(Y)
-    # print(Z)
-
     fig = plt.figure()
     ax = plt.axes(projection='3d')
 
@@ -145,13 +140,13 @@ def plot_gridata(functiondata):
     values = np.asarray(functiondata[2])  # func(points[:, 0], points[:, 1])
     # values.tolist()
 
-    print("checkout our functiondata")
-    print(functiondata[0])
+    # print("checkout our functiondata")
+    # print(functiondata[0])
     # print(test)
-    print(points)
-    print(values)
-    print(len(values))
-    print(values.shape)
+    # print(points)
+    # print(values)
+    # print(len(values))
+    # print(values.shape)
     values = np.expand_dims(values, axis=1)
     print(values.shape)
 
