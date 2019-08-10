@@ -3,14 +3,14 @@ from scipy.linalg import circulant
 from scipy.fftpack import fft
 
 
-def get_fourier_frequencies(wFunction):
-    freqs = np.fft.fftfreq(len(wFunction))
-    return freqs
+def get_fourier_frequencies(wignerFunction):
+    frequencies = np.fft.fftfreq(len(wignerFunction))
+    return frequencies
 
 
 def fft_row(array):
-    fouriervector = np.real(np.abs(fft(array)))
-    return fouriervector
+    fourierVector = np.real(np.abs(fft(array)))
+    return fourierVector
 
 
 def fourier_each_vector(corrmatrix):
@@ -49,11 +49,6 @@ def fit_axis(axis):
     return x
 
 
-def get_meshgrid(x, y):
-    xx, yy = np.meshgrid(x, y)
-    return xx, yy
-
-
 def wignerize_each_function(functionobject):
     xinterpaxis = fit_axis(functionobject[0][0, :])  # upsample - calculate x axis that suits wigner - ie rows
     yinterpaxis = fit_axis(functionobject[1][:, 0])  # upsample - calculate y axis that suits wigner - ie columns
@@ -61,8 +56,8 @@ def wignerize_each_function(functionobject):
     rowfreqs = get_fourier_frequencies(xinterpaxis)  # get the phasespace for rows
     colfreqs = get_fourier_frequencies(yinterpaxis)  # get the phasespace for columns
 
-    rowspace, rowfrequencies = get_meshgrid(xinterpaxis, rowfreqs)
-    colspace, colfrequencies = get_meshgrid(yinterpaxis, colfreqs)
+    rowspace, rowfrequencies = np.meshgrid(xinterpaxis, rowfreqs)
+    colspace, colfrequencies = np.meshgrid(yinterpaxis, colfreqs)
 
     rowwvd = np.apply_along_axis(wigner_function, axis=1, arr=functionobject[2], space=rowspace,
                                  frequencies=rowfrequencies)  # rows

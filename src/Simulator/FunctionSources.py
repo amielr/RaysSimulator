@@ -35,21 +35,15 @@ def rotation_matrices(angle, direction):
 
 def rotate(x, y, z, angle, direction):
     flattenX, flattenY, flattenZ = np.ravel(x), np.ravel(y), np.ravel(z)
-    XYZ = np.stack((flattenX, flattenY, flattenZ))
+    flattenXYZ = np.stack((flattenX, flattenY, flattenZ))
 
-    radian = math.radians(angle)
+    rotatedXYZ = np.matmul(rotation_matrices(angle, direction), flattenXYZ)
 
-    transfravelxyz = np.matmul(rotation_matrices(radian, direction), XYZ)
+    rotatedX = np.reshape(rotatedXYZ[0], x.shape)
+    rotatedY = np.reshape(rotatedXYZ[1], y.shape)
+    rotatedZ = np.reshape(rotatedXYZ[2], z.shape)
 
-    xtransfered = transfravelxyz[0]
-    ytransfered = transfravelxyz[1]
-    ztransfered = transfravelxyz[2]
-
-    xtransfered = np.reshape(xtransfered, x.shape)
-    ytransfered = np.reshape(ytransfered, y.shape)
-    ztransfered = np.reshape(ztransfered, z.shape)
-
-    return xtransfered, ytransfered, ztransfered
+    return rotatedX, rotatedY, rotatedZ
 
 
 def light_source_function():
