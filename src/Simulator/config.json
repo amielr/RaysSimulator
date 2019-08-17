@@ -1,0 +1,22 @@
+{
+    "rayAmplitudeValue": 0,
+    "xStartLocation": 1,
+    "yStartLocation": 2,
+    "zStartLocation": 3,
+    "xMirrorIntersection": 4,
+    "yMirrorIntersection": 5,
+    "zMirrorIntersection": 6,
+    "xMirrorNormal": 7,
+    "yMirrorNormal": 8,
+    "zMirrorNormal": 9,
+    "rayMirrorAngle": 10,
+    "xReflectedRay": 11,
+    "yReflectedRay": 12,
+    "zReflectedRay": 13,
+    "xScreenLocation": 14,
+    "yScreenLocation": 15,
+    "zScreenLocation": 16,
+
+    "mirrorErrorValue": 0.1,
+    "lightSourceDensity": 11
+}
