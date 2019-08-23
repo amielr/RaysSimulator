@@ -20,31 +20,34 @@ def generate_light_source():
     return np.stack((xGrid, yGrid, pulse2d))
 
 
-def create_interpolated_mirror():
-    xDenominator = config["xMirrorDenominator"]
-    yDenominator = config["yMirrorDenominator"]
+def create_interpolated_mirror(mirrorCorrections):
+    xMirrorScale = config["xMirrorScale"]
+    yMirrorScale = config["yMirrorScale"]
+    mirrorGridDensity = config["mirrorGridDensity"]
+    mirrorDimensions = config["mirrorDimensions"]
+    mirrorOffsetFromSource = config["mirrorOffsetFromSource"]
 
-    x, y = np.meshgrid(np.linspace(-150, 150, 50), np.linspace(-150, 150, 50))
-    z = (x ** 2) / xDenominator + (y ** 2) / xDenominator
-    zoverlay = np.zeros(x.shape)
-    z = z + zoverlay
-    interpolatedMirror = interpolate.interp2d(x[0, :], y[:, 0], z, kind='cubic')
+    axis = np.linspace(-mirrorDimensions, mirrorDimensions, mirrorGridDensity)
 
-    zinterp = interpolatedMirror(x[0, :], y[:, 0])
+    xGrid, yGrid = np.meshgrid(axis, axis)
+    mirrorBaseShape = (xGrid ** 2) / xMirrorScale + (yGrid ** 2) / yMirrorScale
+    mirrorBaseShape = mirrorBaseShape + mirrorCorrections
+    interpolatedMirrorBuilder = interpolate.interp2d(axis, axis, mirrorBaseShape, kind='cubic')
 
-    field = ScalarField(x, y, zinterp)
+    interpolatedMirror = interpolatedMirrorBuilder(axis, axis)
+
+    field = ScalarField(xGrid, yGrid, interpolatedMirror)
     field.apply_rotation(angle, direction)
-    field._zScalarField += 450
-    interpolatedMirror = interpolate.interp2d(field._xGrid[0, :], field._yGrid[:, 0], field._zScalarField, kind='cubic')
-    print("shape of zrotate is:" + str(field._zScalarField.shape))
+    field.add_offset(mirrorOffsetFromSource)
+    interpolatedMirrorBuilder = interpolate.interp2d(axis, axis, field._zScalarField, kind='cubic')
 
-    z0 = np.zeros(zinterp.shape)
+    z0 = np.zeros(field._zScalarField.shape)
     zdist = field._zScalarField - z0
     rx = np.ravel(field._xGrid)
     ry = np.ravel(field._yGrid)
     zrotate = np.ravel(field._zScalarField)
     zdist = np.ravel(zdist)
     mirrorobject = np.stack((rx, ry, zrotate, zdist))
-    mirrorobject = np.reshape(mirrorobject, (4, len(x), len(y)))
+    mirrorobject = np.reshape(mirrorobject, (4, len(xGrid), len(yGrid)))
 
-    return mirrorobject, interpolatedMirror
+    return mirrorobject, interpolatedMirrorBuilder

@@ -1,6 +1,6 @@
 from src.Simulator.FunctionSources import generate_light_source, create_interpolated_mirror
 from src.Simulator.PlotFunctions import *
-from src.Simulator.WignerFunction import wignerize_each_function
+from src.Simulator.WignerFunction import wigner_transform
 from src.Simulator.RayPropogation import *
 import json
 
@@ -96,18 +96,18 @@ def error_value_calc(raysobject):
         averagedist.append(np.mean(rayholder[17]))
 
 
-mirrorfunction, mirrorinterpolator = create_interpolated_mirror()
+mirrorBorders, mirrorInterpolatedBuilder = create_interpolated_mirror(np.zeros([50, 50]))
 
-lightsource = generate_light_source()
+lightSource = generate_light_source()
 
-zwignerFunction = wignerize_each_function(lightsource)
+zwignerFunction = wigner_transform(lightSource)
 
 zwignerTranslatedFunction = ray_translated(zwignerFunction, 50)
 
-reverseFunction = integrate_intensity_wig(zwignerFunction, lightsource)
+reverseFunction = integrate_intensity_wig(zwignerFunction, lightSource)
 plot_gridata(reverseFunction)
 
-rayobject = ray_propogation(zwignerFunction, zwignerTranslatedFunction, lightsource, mirrorinterpolator, mirrorfunction)
+rayobject = ray_propogation(zwignerFunction, zwignerTranslatedFunction, lightSource, mirrorInterpolatedBuilder, mirrorBorders)
 
 error_value_calc(rayobject)
 

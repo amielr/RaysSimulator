@@ -35,6 +35,11 @@ class ScalarField:
         self._yGrid = yGrid
         self._zScalarField = zScalarField
 
+    # def __init__(self, limit, step, zScalarField):
+    #     self._xGrid = xGrid
+    #     self._yGrid = yGrid
+    #     self._zScalarField = zScalarField
+
     def apply_rotation(self, angle, direction):
         flattenX, flattenY, flattenZ = np.ravel(self._xGrid), np.ravel(self._yGrid), np.ravel(self._zScalarField)
         stackFlattenXYZ = np.stack((flattenX, flattenY, flattenZ))
@@ -44,3 +49,6 @@ class ScalarField:
         self._xGrid = np.reshape(rotatedXYZ[0], self._xGrid.shape)
         self._yGrid = np.reshape(rotatedXYZ[1], self._yGrid.shape)
         self._zScalarField = np.reshape(rotatedXYZ[2], self._zScalarField.shape)
+
+    def add_offset(self, offset):
+        self._zScalarField += offset

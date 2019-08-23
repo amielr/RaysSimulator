@@ -17,13 +17,16 @@
     "yScreenLocation": 15,
     "zScreenLocation": 16,
 
-    "xMirrorDenominator": -200,
-    "yMirrorDenominator": -200,
+    "xMirrorScale": -225,
+    "yMirrorScale": -225,
 
 
     "mirrorErrorValue": 0.1,
     "lightSourceDensity": 11,
+    "mirrorGridDensity": 50,
+    "mirrorDimensions": 150,
+    "mirrorOffsetFromSource": 450,
 
-    "mirrorRotationAngle": 22.5,
+    "mirrorRotationAngle": 45,
     "mirrorRotationDirection": "y"
 }

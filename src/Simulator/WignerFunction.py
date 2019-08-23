@@ -45,30 +45,35 @@ def wigner_function(lightsourcefunction, space, frequencies):
 
 
 def fit_axis(axis):
-    x = np.linspace(np.amin(axis), np.amax(axis), 2 * len(axis))
-    return x
+    return np.linspace(np.amin(axis), np.amax(axis), 2 * len(axis))
 
 
-def wignerize_each_function(functionobject):
-    xinterpaxis = fit_axis(functionobject[0][0, :])  # upsample - calculate x axis that suits wigner - ie rows
-    yinterpaxis = fit_axis(functionobject[1][:, 0])  # upsample - calculate y axis that suits wigner - ie columns
+def create_wigner_space_and_frequencies(axis):
+    axisUpSample = fit_axis(axis)
 
-    rowfreqs = get_fourier_frequencies(xinterpaxis)  # get the phasespace for rows
-    colfreqs = get_fourier_frequencies(yinterpaxis)  # get the phasespace for columns
+    axisFrequencies = get_fourier_frequencies(axisUpSample)
 
-    rowspace, rowfrequencies = np.meshgrid(xinterpaxis, rowfreqs)
-    colspace, colfrequencies = np.meshgrid(yinterpaxis, colfreqs)
+    axisSpaceGrid, axisFrequenciesGrid = np.meshgrid(axisUpSample, axisFrequencies)
 
-    rowwvd = np.apply_along_axis(wigner_function, axis=1, arr=functionobject[2], space=rowspace,
-                                 frequencies=rowfrequencies)  # rows
-    colwvd = np.apply_along_axis(wigner_function, axis=1, arr=functionobject[2].T, space=colspace,
-                                 frequencies=colfrequencies)  # columns
+    return axisSpaceGrid, axisFrequenciesGrid
 
-    ravelrowwvd = np.ravel(rowwvd)
-    ravelcolwvd = np.ravel(colwvd)
+
+def apply_wigner_along_axis(scalarField, axis):
+    axisSpaceGrid, axisFrequenciesGrid = create_wigner_space_and_frequencies(axis)
+
+    return np.apply_along_axis(wigner_function, axis=1, arr=scalarField, space=axisSpaceGrid,
+                               frequencies=axisFrequenciesGrid)
+
+
+def wigner_transform(functionobject):
+    rowsWignerTransform = apply_wigner_along_axis(functionobject[2], functionobject[0][0, :])
+    columnsWignerTransform = apply_wigner_along_axis(functionobject[2].T, functionobject[1][:, 0])
+
+    ravelrowwvd = np.ravel(rowsWignerTransform)
+    ravelcolwvd = np.ravel(columnsWignerTransform)
 
     wignerobject = np.stack((ravelrowwvd, ravelcolwvd))
-    a, b, c, d = colwvd.shape[0], colwvd.shape[1], colwvd.shape[2], colwvd.shape[3]
+    a, b, c, d = columnsWignerTransform.shape[0], columnsWignerTransform.shape[1], columnsWignerTransform.shape[2], columnsWignerTransform.shape[3]
     wignerobject = np.reshape(wignerobject, (-1, a, b, c, d))
 
     return wignerobject
