@@ -139,7 +139,7 @@ def build_intersections_with_screen(raysobject):
     return rayobjectreturn
 
 
-def ray_propogation(zwignerobject, zwignerobjecttrans, lightsource, mirrorInterpolator, mirrorobject, screen_function):
+def ray_propogation(zwignerobject, zwignerobjecttrans, lightsource, mirrorInterpolator, mirrorobject):
     rayBundle = build_ray_matrices_from_wigner(zwignerobject, zwignerobjecttrans, lightsource)
 
     rayBundle = build_intersections_with_mirror(rayBundle, mirrorInterpolator, mirrorobject)

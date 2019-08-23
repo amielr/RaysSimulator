@@ -1,4 +1,4 @@
-from MirrorPopulation import MirrorPopulation
+from src.GeneticAlgorithm.MirrorPopulation import MirrorPopulation
 
 mirrors = MirrorPopulation()
 index = 1

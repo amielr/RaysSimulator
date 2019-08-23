@@ -49,12 +49,15 @@ def plot_gridata(functiondata):
     values = np.asarray(functiondata[2])
     values = np.expand_dims(values, axis=1)
     print(values.shape)
-
+    print("we are in plot gridata")
     grid_x, grid_y = np.meshgrid(np.linspace(np.amin(functiondata[0]), np.amax(functiondata[0]), 30),
                                  np.linspace(np.amin(functiondata[1]), np.amax(functiondata[1]), 30))
 
-    grid_z1 = griddata(points.T, values, ((grid_x, grid_y)), method='linear')
+    # grid_z0 = griddata(points.T, values, (grid_x, grid_y), method='nearest')
+    grid_z1 = griddata(points.T, values, (grid_x, grid_y), method='linear')
+    # grid_z2 = griddata(points.T, values, (grid_x, grid_y), method='cubic')
     grid_z1 = np.squeeze(grid_z1)
 
     plt.title('Linear')
     plt.imshow(grid_z1.T, extent=(0, 1, 0, 1), origin='lower')
+    plt.show()

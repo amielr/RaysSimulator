@@ -1,4 +1,4 @@
-from src.Simulator.FunctionSources import light_source_function, screen_function, create_interpolated_mirror
+from src.Simulator.FunctionSources import generate_light_source, create_interpolated_mirror
 from src.Simulator.PlotFunctions import *
 from src.Simulator.WignerFunction import wignerize_each_function
 from src.Simulator.RayPropogation import *
@@ -85,7 +85,8 @@ def error_value_calc(raysobject):
              # 1* Amplitude     # 3* spatial origins of ray, 3* intersection point on mirror
              rayholder[7], rayholder[8], rayholder[9], rayholder[10]
              # 3* normal of the surface  1* angle between
-             , rayholder[11], rayholder[12], rayholder[13]  # 3* reflected rays
+             , rayholder[11], rayholder[12], rayholder[13]
+             # 3* reflected rays
              , rayholder[14], rayholder[15], rayholder[16],  # 3* intersection points with screen
              rayholder[16],))  # distance from desired focal point
 
@@ -97,16 +98,16 @@ def error_value_calc(raysobject):
 
 mirrorfunction, mirrorinterpolator = create_interpolated_mirror()
 
-lightsource = light_source_function()
+lightsource = generate_light_source()
 
 zwignerFunction = wignerize_each_function(lightsource)
 
 zwignerTranslatedFunction = ray_translated(zwignerFunction, 50)
-reversefunction = integrate_intensity_wig(zwignerFunction, lightsource)
-plot_gridata(reversefunction)
 
-rayobject = ray_propogation(zwignerFunction, zwignerTranslatedFunction, lightsource, mirrorinterpolator, mirrorfunction,
-                            screen_function)
+reverseFunction = integrate_intensity_wig(zwignerFunction, lightsource)
+plot_gridata(reverseFunction)
+
+rayobject = ray_propogation(zwignerFunction, zwignerTranslatedFunction, lightsource, mirrorinterpolator, mirrorfunction)
 
 error_value_calc(rayobject)
 

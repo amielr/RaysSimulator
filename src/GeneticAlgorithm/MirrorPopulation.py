@@ -1,6 +1,6 @@
 import random
 import numpy as np
-from MirrorCreature import MirrorCreature
+from src.GeneticAlgorithm.MirrorCreature import MirrorCreature
 import json
 
 with open('config.json') as config_file:
