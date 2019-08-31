@@ -18,49 +18,66 @@ def line_plane_collision(planeNormal, planePoint, rayDirection, rayPoint, epsilo
     return psi
 
 
-def build_ray_matrices_from_wigner(wignertransform, translatedwignertransform, functionobject):
-    zDist = 750
-    rayobject = []
 
-    rowsWignerTransform = wignertransform[0]
-    columnsWignerTransform = wignertransform[1]
+def rays_from_row_wigner_transform(rayobject, lineWignerTransform, functionValues, lineTranslatedWignerTransform):
+    zDistance = 750
+    repetitions = len(np.ravel(lineWignerTransform[0, 1]))
 
-    rowsTranslatedWignerTransform = translatedwignertransform[0]
-    columnsTranslatedWignerTransform = translatedwignertransform[1]
-
-    functionXValues = functionobject[0]
-    functionYValues = functionobject[1]
-
-    repetitions = len(np.ravel(rowsWignerTransform[0, 1]))
-
-    for i in range(len(rowsWignerTransform)):
-        rowAmplitudes = np.ravel(rowsWignerTransform[i, 0])
-        rowXOriginalLocations = np.ravel(rowsWignerTransform[i, 1])
-        yValue = functionYValues[i, 1]
+    for i in range(len(lineWignerTransform)):
+        rowAmplitudes = np.ravel(lineWignerTransform[i, 0])
+        rowXOriginalLocations = np.ravel(lineWignerTransform[i, 1])
+        yValue = functionValues[i, 1]
         rowYLocations = np.repeat(yValue, repetitions)
         z0 = np.zeros(repetitions)
-        rowXTranslatedLocations = np.ravel(rowsTranslatedWignerTransform[i, 1])
-        zd = np.repeat(zDist, repetitions)
+        rowXTranslatedLocations = np.ravel(lineTranslatedWignerTransform[i, 1])
+        zd = np.repeat(zDistance, repetitions)
 
-        raypacket = np.stack((rowAmplitudes, rowXOriginalLocations, rowYLocations, z0, rowXTranslatedLocations, rowYLocations, zd))
+        raypacket = np.stack(
+            (rowAmplitudes, rowXOriginalLocations, rowYLocations, z0, rowXTranslatedLocations, rowYLocations, zd))
         print("finished row")
         rayobject.append(raypacket)
 
-    for i in range(len(columnsWignerTransform)):
+    return rayobject
+
+
+def rays_from_col_wigner_transform(rayobject, lineWignerTransform, functionValues, lineTranslatedWignerTransform):
+    zDistance = 750
+    repetitions = len(np.ravel(lineWignerTransform[0, 1]))
+
+    for i in range(len(lineWignerTransform)):
         print(i)
-        colAmplitudes = np.ravel(columnsWignerTransform[i, 0])
-        colYOriginalLocations = np.ravel(columnsWignerTransform[i, 1])
-        xValue = functionXValues[1, i]
+        colAmplitudes = np.ravel(lineWignerTransform[i, 0])
+        colYOriginalLocations = np.ravel(lineWignerTransform[i, 1])
+        xValue = functionValues[1, i]
         colXLocations = np.repeat(xValue, repetitions)
         z0 = np.zeros(repetitions)
-        colYTranslatedLocations = np.ravel(columnsTranslatedWignerTransform[i, 1])
-        zd = np.repeat(zDist, repetitions)
+        colYTranslatedLocations = np.ravel(lineTranslatedWignerTransform[i, 1])
+        zd = np.repeat(zDistance, repetitions)
 
         raypacket = np.stack(
             (colAmplitudes, colXLocations, colYOriginalLocations, z0, colXLocations, colYTranslatedLocations, zd))
         print("finished column")
         rayobject.append(raypacket)
+
     return rayobject
+
+
+def prepare_wigner_data_for_deconstruction_to_rays(wignerTransform, translatedWignerTransform, lightSourceCoordinates):
+    return wignerTransform, translatedWignerTransform, lightSourceCoordinates
+
+def build_ray_matrices_from_wigner(wignerTransform, translatedWignerTransform, lightSource):
+    zDistance = 750
+    raybundle = []
+
+    rowsWignerTransform, rowsTranslatedWignerTransform, lightSourceXCoordinates = \
+        prepare_wigner_data_for_deconstruction_to_rays(wignerTransform[0], translatedWignerTransform[0], lightSource[0])
+    columnsWignerTransform, columnsTranslatedWignerTransform, lightSourceYCoordinates = \
+        prepare_wigner_data_for_deconstruction_to_rays(wignerTransform[1], translatedWignerTransform[1], lightSource[1])
+
+    raybundle = rays_from_row_wigner_transform(raybundle, rowsWignerTransform, lightSourceYCoordinates, rowsTranslatedWignerTransform)
+    raybundle = rays_from_col_wigner_transform(raybundle, columnsWignerTransform, lightSourceXCoordinates, columnsTranslatedWignerTransform)
+
+    return raybundle
 
 
 def build_intersections_with_mirror(rayBundle, mirrorInterpolator, mirrorFunction):
