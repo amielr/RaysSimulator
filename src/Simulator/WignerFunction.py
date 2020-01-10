@@ -28,8 +28,8 @@ def prep_corr_matrix_from_vector(vector):
     return iteratedmatrix
 
 
-def wigner_function(lightsourcefunction, space, frequencies):
-    corrmatrix = prep_corr_matrix_from_vector(lightsourcefunction)
+def wigner_function(scalarField, space, frequencies):
+    corrmatrix = prep_corr_matrix_from_vector(scalarField)
     wignerdist = fourier_each_vector(corrmatrix)
     ravelwig = np.ravel(wignerdist)
     ravelspace = np.ravel(space)
@@ -48,18 +48,12 @@ def fit_axis(axis):
     return np.linspace(np.amin(axis), np.amax(axis), 2 * len(axis))
 
 
-def create_wigner_space_and_frequencies(axis):
+def apply_wigner_along_axis(scalarField, axis):
     axisUpSample = fit_axis(axis)
 
     axisFrequencies = get_fourier_frequencies(axisUpSample)
 
     axisSpaceGrid, axisFrequenciesGrid = np.meshgrid(axisUpSample, axisFrequencies)
-
-    return axisSpaceGrid, axisFrequenciesGrid
-
-
-def apply_wigner_along_axis(scalarField, axis):
-    axisSpaceGrid, axisFrequenciesGrid = create_wigner_space_and_frequencies(axis)
 
     return np.apply_along_axis(wigner_function, axis=1, arr=scalarField, space=axisSpaceGrid,
                                frequencies=axisFrequenciesGrid)

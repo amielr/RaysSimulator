@@ -1,3 +1,5 @@
+import math
+
 from src.Simulator.FunctionSources import generate_light_source, create_interpolated_mirror
 from src.Simulator.PlotFunctions import *
 from src.Simulator.WignerFunction import wigner_transform
@@ -75,28 +77,19 @@ def ray_translated(wignerobject, dist):
     return transformedwigner
 
 
-def error_value_calc(raysobject):
-    idealx, idealy, idealz = -200, 0, 130
-    averagedist = []
+def error_value_calc(screenPoints):
+    idealPoint = Vector(-200, 0, 130)
 
-    for rayholder in raysobject:  # for each function row of rays
-        rayholder = np.stack(
-            (rayholder[0], rayholder[1], rayholder[2], rayholder[3], rayholder[4], rayholder[5], rayholder[6],
-             # 1* Amplitude     # 3* spatial origins of ray, 3* intersection point on mirror
-             rayholder[7], rayholder[8], rayholder[9], rayholder[10]
-             # 3* normal of the surface  1* angle between
-             , rayholder[11], rayholder[12], rayholder[13]
-             # 3* reflected rays
-             , rayholder[14], rayholder[15], rayholder[16],  # 3* intersection points with screen
-             rayholder[16],))  # distance from desired focal point
-
-        for i in range(len(rayholder[0])):
-            rayholder[17][i] = math.sqrt((rayholder[14][i] - idealx) ** 2 + (rayholder[15][i] - idealy) ** 2 + (
-                    rayholder[16][i] - idealz) ** 2) * abs(rayholder[0][i])
-        averagedist.append(np.mean(rayholder[17]))
+    aggregatedError = 0
+    for point in screenPoints:
+        aggregatedError += math.sqrt((point.getX() - idealPoint.getX()) ** 2
+                           + (point.getY() - idealPoint.getY()) ** 2
+                           + (point.getZ() - idealPoint.getZ()) ** 2)
+    return aggregatedError / len(screenPoints)
 
 
-mirrorBorders, mirrorInterpolatedBuilder = create_interpolated_mirror(np.zeros([config["mirrorGridDensity"], config["mirrorGridDensity"]]))
+mirrorBorders, mirrorInterpolatedBuilder = create_interpolated_mirror(
+    np.zeros([config["mirrorGridDensity"], config["mirrorGridDensity"]]))
 
 lightSource = generate_light_source()
 
@@ -105,17 +98,15 @@ zwignerFunction = wigner_transform(lightSource)
 zwignerTranslatedFunction = ray_translated(zwignerFunction, 50)
 
 reverseFunction = integrate_intensity_wig(zwignerFunction, lightSource)
-#plot_gridata(reverseFunction)
+# plot_gridata(reverseFunction)
 
-rayobject = ray_propogation(zwignerFunction, zwignerTranslatedFunction, lightSource, mirrorInterpolatedBuilder, mirrorBorders)
+screenPoints = ray_propogation(zwignerFunction, zwignerTranslatedFunction, lightSource, mirrorInterpolatedBuilder,
+                               mirrorBorders)
 
-error_value_calc(rayobject)
+error = error_value_calc(screenPoints)
 
-midPoint = int(config["lightSourceDensity"])
-midPoint = midPoint // 2
+print(error)
 
-#plot_3d_to_2d(zwignerFunction[0][midPoint][1], zwignerFunction[0][midPoint][2], zwignerFunction[0][midPoint][0])
+# plot_3d_to_2d(zwignerFunction[0][midPoint][1], zwignerFunction[0][midPoint][2], zwignerFunction[0][midPoint][0])
 
-#plot_scatter(rayobject, 14, 15, 16)
-
-error_value_calc(rayobject)
+# plot_scatter(rayobject, 14, 15, 16)

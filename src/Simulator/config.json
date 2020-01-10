@@ -16,14 +16,14 @@
 
     "xScreenLocation": -200,
     "yScreenLocation": 0,
-    "zScreenLocation": 450,
+    "zScreenLocation": 4500,
 
     "xMirrorScale": -225,
     "yMirrorScale": -225,
 
-    "mirrorErrorValue": 0.0001,
+    "mirrorErrorValue": 0.1,
     "lightSourceDensity": 11,
-    "mirrorGridDensity": 5,
+    "mirrorGridDensity": 31,
     "mirrorDimensions": 150,
     "mirrorOffsetFromSource": 4500,
 

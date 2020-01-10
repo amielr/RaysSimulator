@@ -1,7 +1,5 @@
 import math
 
-import numpy as np
-
 
 class Vector:
     x, y, z = 0, 0, 0

@@ -1,18 +1,9 @@
 import numpy as np
-import math
-from numpy import linalg as LA
-import time
 
-from Simulator.Vector import Vector
+from src.Simulator.Vector import Vector
 
 
-def max_min(mirrorfunction):
-    maxmin = np.array(([np.max(mirrorfunction[0]), np.min(mirrorfunction[0])],
-                       [np.max(mirrorfunction[1]), np.min(mirrorfunction[1])]))
-    return maxmin
-
-
-def return_vector_properties2(allRaysFromLine, rayNumber):
+def return_vector_properties(allRaysFromLine, rayNumber):
     xStart = allRaysFromLine[1][rayNumber]
     xEnd = allRaysFromLine[4][rayNumber]
     yStart = allRaysFromLine[2][rayNumber]
@@ -30,11 +21,8 @@ def return_vector_properties2(allRaysFromLine, rayNumber):
 
 
 def is_ray_in_mirror_bounds(mirrorHitPoint, mirrorBorders):
-    if (mirrorBorders[0, 0] > mirrorHitPoint.getX() > mirrorBorders[0, 1] and
-            mirrorBorders[1, 0] > mirrorHitPoint.getY() > mirrorBorders[1, 1]):
-        return True
-    else:
-        return False
+    return mirrorBorders[0, 0] > mirrorHitPoint.getX() > mirrorBorders[0, 1] and\
+           mirrorBorders[1, 0] > mirrorHitPoint.getY() > mirrorBorders[1, 1]
 
 
 def get_ray_mirror_intersection_point(wantedError, mirror_interp, ray):
@@ -42,28 +30,23 @@ def get_ray_mirror_intersection_point(wantedError, mirror_interp, ray):
     currentZ = mirror_interp(checkpointLocation.getX(), checkpointLocation.getY())
     error = currentZ - checkpointLocation.getZ()
 
-    count = 0
-
     while abs(error) > wantedError:
-        count += 1
         checkpointLocation = checkpointLocation + ray.getDirection() * error
         currentZ = mirror_interp(checkpointLocation.getX(), checkpointLocation.getY())
         error = currentZ - checkpointLocation.getZ()
-
-    print(count)
 
     return checkpointLocation
 
 
 def get_reflected_ray_from_mirror(mirrorHitPoint, mirrorInterpolator, ray):
-    plane_normal = planes_of_mirror_intersections(mirrorHitPoint, mirrorInterpolator)
+    plane_normal = generate_plane_normal(mirrorHitPoint, mirrorInterpolator)
 
     reflectedRayDirection = get_reflected_direction(ray.getDirection(), plane_normal)
 
     return reflectedRayDirection
 
 
-def planes_of_mirror_intersections(mirrorHitPoint, mirrorInterpolator):
+def generate_plane_normal(mirrorHitPoint, mirrorInterpolator):
     dx = 0.2
     dy = 0.2
 

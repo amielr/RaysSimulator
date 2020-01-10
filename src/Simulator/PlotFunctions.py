@@ -1,7 +1,9 @@
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
+import matplotlib
 from scipy.interpolate import griddata
 import numpy as np
+matplotlib.use('TkAgg')
 
 
 def plot_3d_to_2d(X, Y, Z):
