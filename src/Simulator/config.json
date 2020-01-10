@@ -13,19 +13,19 @@
     "xReflectedRay": 11,
     "yReflectedRay": 12,
     "zReflectedRay": 13,
-    "xScreenLocation": 14,
-    "yScreenLocation": 15,
-    "zScreenLocation": 16,
+
+    "xScreenLocation": -200,
+    "yScreenLocation": 0,
+    "zScreenLocation": 450,
 
     "xMirrorScale": -225,
     "yMirrorScale": -225,
 
-
-    "mirrorErrorValue": 0.1,
+    "mirrorErrorValue": 0.0001,
     "lightSourceDensity": 11,
-    "mirrorGridDensity": 50,
+    "mirrorGridDensity": 5,
     "mirrorDimensions": 150,
-    "mirrorOffsetFromSource": 450,
+    "mirrorOffsetFromSource": 4500,
 
     "mirrorRotationAngle": 45,
     "mirrorRotationDirection": "y"

@@ -1,4 +1,5 @@
 import numpy as np
+from src.Simulator.MirrorIntersectionFunctions import max_min
 from scipy import interpolate
 import json
 
@@ -31,6 +32,7 @@ def create_interpolated_mirror(mirrorCorrections):
 
     xGrid, yGrid = np.meshgrid(axis, axis)
     mirrorBaseShape = (xGrid ** 2) / xMirrorScale + (yGrid ** 2) / yMirrorScale
+    #mirrorBaseShape = xGrid + yGrid
     mirrorBaseShape = mirrorBaseShape + mirrorCorrections
     interpolatedMirrorBuilder = interpolate.interp2d(axis, axis, mirrorBaseShape, kind='cubic')
 
@@ -47,7 +49,8 @@ def create_interpolated_mirror(mirrorCorrections):
     ry = np.ravel(field._yGrid)
     zrotate = np.ravel(field._zScalarField)
     zdist = np.ravel(zdist)
-    mirrorobject = np.stack((rx, ry, zrotate, zdist))
-    mirrorobject = np.reshape(mirrorobject, (4, len(xGrid), len(yGrid)))
+    mirrorBorders = np.stack((rx, ry, zrotate, zdist))
+    mirrorBorders = np.reshape(mirrorBorders, (4, len(xGrid), len(yGrid)))
+    mirrorBorders = max_min(mirrorBorders)
 
-    return mirrorobject, interpolatedMirrorBuilder
+    return mirrorBorders, interpolatedMirrorBuilder

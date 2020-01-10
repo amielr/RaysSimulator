@@ -96,7 +96,7 @@ def error_value_calc(raysobject):
         averagedist.append(np.mean(rayholder[17]))
 
 
-mirrorBorders, mirrorInterpolatedBuilder = create_interpolated_mirror(np.zeros([50, 50]))
+mirrorBorders, mirrorInterpolatedBuilder = create_interpolated_mirror(np.zeros([config["mirrorGridDensity"], config["mirrorGridDensity"]]))
 
 lightSource = generate_light_source()
 
@@ -105,7 +105,7 @@ zwignerFunction = wigner_transform(lightSource)
 zwignerTranslatedFunction = ray_translated(zwignerFunction, 50)
 
 reverseFunction = integrate_intensity_wig(zwignerFunction, lightSource)
-plot_gridata(reverseFunction)
+#plot_gridata(reverseFunction)
 
 rayobject = ray_propogation(zwignerFunction, zwignerTranslatedFunction, lightSource, mirrorInterpolatedBuilder, mirrorBorders)
 
@@ -114,8 +114,8 @@ error_value_calc(rayobject)
 midPoint = int(config["lightSourceDensity"])
 midPoint = midPoint // 2
 
-plot_3d_to_2d(zwignerFunction[0][midPoint][1], zwignerFunction[0][midPoint][2], zwignerFunction[0][midPoint][0])
+#plot_3d_to_2d(zwignerFunction[0][midPoint][1], zwignerFunction[0][midPoint][2], zwignerFunction[0][midPoint][0])
 
-plot_scatter(rayobject, 14, 15, 16)
+#plot_scatter(rayobject, 14, 15, 16)
 
 error_value_calc(rayobject)

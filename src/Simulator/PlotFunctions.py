@@ -23,7 +23,6 @@ def plot_scatter(raysobject, a, b, c):
     Z = []
     for rayholder in raysobject:  # for each function row of rays
 
-        print("newrow")
         for i in range(len(rayholder[0])):
             mx = rayholder[a][i]  # - rayholder[0][i]
             ny = rayholder[b][i]  # - rayholder[1][i]

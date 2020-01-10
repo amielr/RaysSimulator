@@ -1,6 +1,10 @@
 from src.Simulator.MirrorIntersectionFunctions import *
+from src.Simulator.Ray import Ray
 import numpy as np
+import numpy.ma as ma
+
 import json
+
 with open('config.json') as config_file:
     config = json.load(config_file)
 
@@ -18,109 +22,119 @@ def line_plane_collision(planeNormal, planePoint, rayDirection, rayPoint, epsilo
     return psi
 
 
+def remove_rays_of_zero_amplitude(nonZeroIndices, array):
+    newArray = array[nonZeroIndices]
+    return newArray
 
-def rays_from_row_wigner_transform(rayobject, lineWignerTransform, functionValues, lineTranslatedWignerTransform):
+
+def create_rays_from_wigner_transform(rayObjectList, lineWignerTransform, functionValues, lineTranslatedWignerTransform,
+                                      isrow):
     zDistance = 750
     repetitions = len(np.ravel(lineWignerTransform[0, 1]))
 
-    for i in range(len(lineWignerTransform)):
-        rowAmplitudes = np.ravel(lineWignerTransform[i, 0])
-        rowXOriginalLocations = np.ravel(lineWignerTransform[i, 1])
-        yValue = functionValues[i, 1]
-        rowYLocations = np.repeat(yValue, repetitions)
+    for location in range(len(lineWignerTransform)):
+
+        # for location in range(len(wignerrow)):
+        #     print(wignerrow[location])
+
+        Amplitudes = np.ravel(lineWignerTransform[location, 0])
+        nonzeroindices = np.nonzero(Amplitudes)
+        Amplitudes = remove_rays_of_zero_amplitude(nonzeroindices, Amplitudes)
+
+        rowXOriginalLocations = np.ravel(lineWignerTransform[location, 1])
+        rowXOriginalLocations = remove_rays_of_zero_amplitude(nonzeroindices, rowXOriginalLocations)
+
         z0 = np.zeros(repetitions)
-        rowXTranslatedLocations = np.ravel(lineTranslatedWignerTransform[i, 1])
+        z0 = remove_rays_of_zero_amplitude(nonzeroindices, z0)
+
+        rowXTranslatedLocations = np.ravel(lineTranslatedWignerTransform[location, 1])
+        rowXTranslatedLocations = remove_rays_of_zero_amplitude(nonzeroindices, rowXTranslatedLocations)
+
         zd = np.repeat(zDistance, repetitions)
+        zd = remove_rays_of_zero_amplitude(nonzeroindices, zd)
 
-        raypacket = np.stack(
-            (rowAmplitudes, rowXOriginalLocations, rowYLocations, z0, rowXTranslatedLocations, rowYLocations, zd))
-        print("finished row")
-        rayobject.append(raypacket)
+        if isrow:
+            yValue = functionValues[location, 1]
+            rowYLocations = np.repeat(yValue, repetitions)
+            rowYLocations = remove_rays_of_zero_amplitude(nonzeroindices, rowYLocations)
 
-    return rayobject
+            rayPacket = np.stack(
+                (Amplitudes, rowXOriginalLocations, rowYLocations, z0, rowXTranslatedLocations, rowYLocations, zd))
+            print("finished row")
+        else:
+            yValue = functionValues[1, location]
+            rowYLocations = np.repeat(yValue, repetitions)
+            rowYLocations = remove_rays_of_zero_amplitude(nonzeroindices, rowYLocations)
+            rayPacket = np.stack(
+                (Amplitudes, rowYLocations, rowXOriginalLocations, z0, rowYLocations, rowXTranslatedLocations, zd))
+            print("finished columns")
 
-
-def rays_from_col_wigner_transform(rayobject, lineWignerTransform, functionValues, lineTranslatedWignerTransform):
-    zDistance = 750
-    repetitions = len(np.ravel(lineWignerTransform[0, 1]))
-
-    for i in range(len(lineWignerTransform)):
-        print(i)
-        colAmplitudes = np.ravel(lineWignerTransform[i, 0])
-        colYOriginalLocations = np.ravel(lineWignerTransform[i, 1])
-        xValue = functionValues[1, i]
-        colXLocations = np.repeat(xValue, repetitions)
-        z0 = np.zeros(repetitions)
-        colYTranslatedLocations = np.ravel(lineTranslatedWignerTransform[i, 1])
-        zd = np.repeat(zDistance, repetitions)
-
-        raypacket = np.stack(
-            (colAmplitudes, colXLocations, colYOriginalLocations, z0, colXLocations, colYTranslatedLocations, zd))
-        print("finished column")
-        rayobject.append(raypacket)
-
-    return rayobject
+        if len(rayPacket) != 0:
+            rayObjectList.append(rayPacket)
+    return rayObjectList
 
 
 def prepare_wigner_data_for_deconstruction_to_rays(wignerTransform, translatedWignerTransform, lightSourceCoordinates):
     return wignerTransform, translatedWignerTransform, lightSourceCoordinates
 
-def build_ray_matrices_from_wigner(wignerTransform, translatedWignerTransform, lightSource):
-    zDistance = 750
-    raybundle = []
 
+def convertRaysToObjects(stackedRays):
+    print("length of stacked rays" + str(len(stackedRays)))
+    ListOfRayObjects = []
+    for singleRow in stackedRays:
+        for rayNumber in range(len(singleRow[0])):
+            origin, direction = return_vector_properties2(singleRow, rayNumber)
+            # return_vector_properties(singleRow, rayNumber)
+            # dx = singleRow[4, rayNumber] - singleRow[1, rayNumber]
+            # dy = singleRow[5, rayNumber] - singleRow[2, rayNumber]
+            # dz = singleRow[6, rayNumber] - singleRow[3, rayNumber]
+            rayexample = Ray(origin, direction, singleRow[0, rayNumber])
+            # print(rayexample.amplitude)
+            ListOfRayObjects.append(rayexample)
+    # print("lenght of list of ray objects")
+    # print(len(ListOfRayObjects))
+    # print(ListOfRayObjects[45].getAmplitude())
+    # print(Ray.getNumberOfRays)
+    # print(Ray.number_of_rays)
+    return ListOfRayObjects
+
+
+def build_ray_object_list_from_wigner(wignerTransform, translatedWignerTransform, lightSource):
     rowsWignerTransform, rowsTranslatedWignerTransform, lightSourceXCoordinates = \
         prepare_wigner_data_for_deconstruction_to_rays(wignerTransform[0], translatedWignerTransform[0], lightSource[0])
     columnsWignerTransform, columnsTranslatedWignerTransform, lightSourceYCoordinates = \
         prepare_wigner_data_for_deconstruction_to_rays(wignerTransform[1], translatedWignerTransform[1], lightSource[1])
+    isRow = True
 
-    raybundle = rays_from_row_wigner_transform(raybundle, rowsWignerTransform, lightSourceYCoordinates, rowsTranslatedWignerTransform)
-    raybundle = rays_from_col_wigner_transform(raybundle, columnsWignerTransform, lightSourceXCoordinates, columnsTranslatedWignerTransform)
+    stacked_ray_list = []
 
-    return raybundle
+    stacked_ray_list = create_rays_from_wigner_transform(stacked_ray_list, rowsWignerTransform, lightSourceYCoordinates,
+                                                         rowsTranslatedWignerTransform, isRow)
+    stacked_ray_list = create_rays_from_wigner_transform(stacked_ray_list, columnsWignerTransform,
+                                                         lightSourceXCoordinates, columnsTranslatedWignerTransform,
+                                                         not isRow)
+
+    print("number of rays are:")
+    print(len(stacked_ray_list))
+    ray_list = convertRaysToObjects(stacked_ray_list)
+
+    return ray_list
 
 
-def build_intersections_with_mirror(rayBundle, mirrorInterpolator, mirrorFunction):
-    rayObjectReturn = []
+def build_intersections_with_mirror(rayList, mirrorInterpolator, mirrorBorders):
+    reflectedRayList = []
     errorValue = config["mirrorErrorValue"]
 
-    mirrorBorders = max_min(mirrorFunction)
+    for ray in rayList:
+        mirrorHitPoint = get_ray_mirror_intersection_point(errorValue, mirrorInterpolator, ray)
 
-    for allRaysFromLine in rayBundle:  # for each function row of rays
-        removeelements = []
+        if is_ray_in_mirror_bounds(mirrorHitPoint, mirrorBorders):
+            reflectedRayDirection = get_reflected_ray_from_mirror(mirrorHitPoint, mirrorInterpolator, ray)
 
-        allRaysFromLine = np.stack((allRaysFromLine[config["rayAmplitudeValue"]], allRaysFromLine[1], allRaysFromLine[2]
-                                    , allRaysFromLine[3], allRaysFromLine[4], allRaysFromLine[5],
-                                    allRaysFromLine[6], allRaysFromLine[4], allRaysFromLine[5], allRaysFromLine[5],
-                                    allRaysFromLine[4], allRaysFromLine[5], allRaysFromLine[5], allRaysFromLine[5]))
+            reflectedRay = Ray(mirrorHitPoint, reflectedRayDirection, ray.getAmplitude())
+            reflectedRayList.append(reflectedRay)
 
-        for rayNumber in range(len(allRaysFromLine[0])):  # run through all rays along array
-
-            xPoint, yPoint, zPoint, xDirection, yDirection, zDirection = return_vector_properties(allRaysFromLine, rayNumber)
-
-            checkPoint = iterate_till_error_reached(errorValue, mirrorInterpolator, [xPoint, yPoint, zPoint, xDirection, yDirection, zDirection])
-
-            allRaysFromLine[4][rayNumber], allRaysFromLine[5][rayNumber], allRaysFromLine[6][rayNumber] = \
-                mirror_intersection_points(allRaysFromLine, rayNumber, checkPoint)
-
-            allRaysFromLine[7][rayNumber], allRaysFromLine[8][rayNumber], allRaysFromLine[9][rayNumber] = \
-                planes_of_mirror_intersections(allRaysFromLine, rayNumber, mirrorInterpolator)
-
-            allRaysFromLine[10][rayNumber] = angle_of_ray_with_mirror(allRaysFromLine, rayNumber)
-
-            allRaysFromLine[11][rayNumber], allRaysFromLine[12][rayNumber], allRaysFromLine[13][rayNumber] = \
-                reflected_vector_from_mirror(allRaysFromLine, rayNumber)
-
-            if is_ray_in_mirror_bounds(allRaysFromLine, rayNumber, mirrorBorders):
-                continue
-            else:
-                removeelements.append(rayNumber)
-                continue
-
-        rayholderbuild = np.delete(allRaysFromLine[:], np.s_[removeelements], 1)
-        rayObjectReturn.append(rayholderbuild)
-
-    return rayObjectReturn
+    return reflectedRayList
 
 
 def build_intersections_with_screen(raysobject):
@@ -133,7 +147,7 @@ def build_intersections_with_screen(raysobject):
              rayholder[7], rayholder[8], rayholder[9], rayholder[10]
              # 3* normal of the surface  1* angle between
              , rayholder[11], rayholder[12], rayholder[13],  # 3* reflected rays
-                rayholder[11], rayholder[12], rayholder[13],))  # 3* intersection points with screen
+             rayholder[11], rayholder[12], rayholder[13],))  # 3* intersection points with screen
         for i in range(len(rayholder[0])):  # run through all elements along array
             mx = rayholder[11][i]  # - rayholder[4][i]
             ny = rayholder[12][i]  # - rayholder[5][i]
@@ -143,7 +157,7 @@ def build_intersections_with_screen(raysobject):
             raypoint = np.array((rayholder[4][i], rayholder[5][i], rayholder[6][i]))
 
             planenormal = np.array([1, 0, 0])
-            planepoint = np.array([-200, 0, 450])
+            planepoint = np.array([config["xScreenLocation"], config["yScreenLocation"], config["zScreenLocation"]])
 
             intersection = line_plane_collision(planenormal, planepoint, raydirection, raypoint)
 
@@ -156,10 +170,10 @@ def build_intersections_with_screen(raysobject):
     return rayobjectreturn
 
 
-def ray_propogation(zwignerobject, zwignerobjecttrans, lightsource, mirrorInterpolator, mirrorobject):
-    rayBundle = build_ray_matrices_from_wigner(zwignerobject, zwignerobjecttrans, lightsource)
+def ray_propogation(zwignerobject, zwignerobjecttrans, lightsource, mirrorInterpolator, mirrorBorders):
+    rayObjectList = build_ray_object_list_from_wigner(zwignerobject, zwignerobjecttrans, lightsource)
 
-    rayBundle = build_intersections_with_mirror(rayBundle, mirrorInterpolator, mirrorobject)
+    rayBundle = build_intersections_with_mirror(rayObjectList, mirrorInterpolator, mirrorBorders)
 
     rayBundle = build_intersections_with_screen(rayBundle)
     return rayBundle
