@@ -9,3 +9,5 @@ src/GeneticAlgorithm/__pycache__/
 >>>>>>> CR_Fix
 
 src/Simulator/__pycache__/
+
+venv/
