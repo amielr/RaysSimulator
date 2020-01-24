@@ -30,6 +30,9 @@ class Vector:
     def __sub__(self, vector):
         return Vector(self.x - vector.x, self.y - vector.y, self.z - vector.z)
 
+    def __pow__(self, powerVal):
+        return self.x**powerVal + self.y**powerVal + self.z**powerVal
+
     def __add__(self, vector):
         return Vector(self.x + vector.x, self.y + vector.y, self.z + vector.z)
 

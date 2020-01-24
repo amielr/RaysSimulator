@@ -72,7 +72,7 @@ def prepare_wigner_data_for_deconstruction_to_rays(wignerTransform, translatedWi
     return wignerTransform, translatedWignerTransform, lightSourceCoordinates
 
 
-def convertRaysToObjects(stackedRays):
+def convert_rays_to_objects(stackedRays):
     rayList = []
     for singleRow in stackedRays:
         for rayNumber in range(len(singleRow[0])):
@@ -109,7 +109,7 @@ def build_ray_object_list_from_wigner(wignerTransform, translatedWignerTransform
                                                          lightSourceXCoordinates, columnsTranslatedWignerTransform,
                                                          not isRow)
 
-    return convertRaysToObjects(stacked_ray_list)
+    return convert_rays_to_objects(stacked_ray_list)
 
 
 def build_intersections_with_mirror(rayList, mirrorInterpolator, mirrorBorders):
@@ -136,9 +136,14 @@ def build_intersections_with_screen(rayList):
                               config["zScreenLocation"]),
                        Vector(1, 0, 0), 1)
 
-    screenPoints = [line_plane_collision(screenNormal, ray) for ray in rayList]
+    raysAtScreenList = []
 
-    return screenPoints
+    for ray in rayList:
+
+        screenPoints = line_plane_collision(screenNormal, ray)
+        rayAtScreen = Ray(screenPoints, ray.getDirection(), ray.getAmplitude())
+        raysAtScreenList.append(rayAtScreen)
+    return raysAtScreenList
 
 
 def ray_propogation(zwignerobject, zwignerobjecttrans, lightsource, mirrorInterpolator, mirrorBorders):

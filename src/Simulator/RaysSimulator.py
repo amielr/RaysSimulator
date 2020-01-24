@@ -77,21 +77,24 @@ def ray_translated(wignerobject, dist):
     return transformedwigner
 
 
-def error_value_calc(screenPoints):
-    idealPoint = Vector(-200, 0, 130)
+def error_value_calc(screenRays):
+    idealPoint = Vector(-200, 0, 180)
 
     aggregatedError = 0
-    for point in screenPoints:
-        aggregatedError += math.sqrt((point.getX() - idealPoint.getX()) ** 2
-                           + (point.getY() - idealPoint.getY()) ** 2
-                           + (point.getZ() - idealPoint.getZ()) ** 2)
-    return aggregatedError / len(screenPoints)
+    for ray in screenRays:
+
+        aggregatedError += ray.getAmplitude() * math.sqrt((ray.getOrigin() - idealPoint)**2)
+
+    return aggregatedError / len(screenRays)
 
 
 mirrorBorders, mirrorInterpolatedBuilder = create_interpolated_mirror(
     np.zeros([config["mirrorGridDensity"], config["mirrorGridDensity"]]))
 
 lightSource = generate_light_source()
+
+
+print(lightSource[1][:,0])
 
 zwignerFunction = wigner_transform(lightSource)
 
@@ -100,10 +103,10 @@ zwignerTranslatedFunction = ray_translated(zwignerFunction, 50)
 reverseFunction = integrate_intensity_wig(zwignerFunction, lightSource)
 # plot_gridata(reverseFunction)
 
-screenPoints = ray_propogation(zwignerFunction, zwignerTranslatedFunction, lightSource, mirrorInterpolatedBuilder,
+screenRays = ray_propogation(zwignerFunction, zwignerTranslatedFunction, lightSource, mirrorInterpolatedBuilder,
                                mirrorBorders)
 
-error = error_value_calc(screenPoints)
+error = error_value_calc(screenRays)
 
 print(error)
 
