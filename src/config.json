@@ -1,0 +1,36 @@
+{
+  "population_size": 100,
+  "best_percent": 0.1,
+  "mutation_rate": 0.01,
+
+  "rayAmplitudeValue": 0,
+  "xStartLocation": 1,
+  "yStartLocation": 2,
+  "zStartLocation": 3,
+  "xMirrorIntersection": 4,
+  "yMirrorIntersection": 5,
+  "zMirrorIntersection": 6,
+  "xMirrorNormal": 7,
+  "yMirrorNormal": 8,
+  "zMirrorNormal": 9,
+  "rayMirrorAngle": 10,
+  "xReflectedRay": 11,
+  "yReflectedRay": 12,
+  "zReflectedRay": 13,
+
+  "xScreenLocation": -200,
+  "yScreenLocation": 0,
+  "zScreenLocation": 450,
+
+  "xMirrorScale": -225,
+  "yMirrorScale": -225,
+
+  "mirrorErrorValue": 0.1,
+  "lightSourceDensity": 15,
+  "mirrorGridDensity": 31,
+  "mirrorDimensions": 150,
+  "mirrorOffsetFromSource": 450,
+
+  "mirrorRotationAngle": 45,
+  "mirrorRotationDirection": "y"
+}

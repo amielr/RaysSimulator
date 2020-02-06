@@ -4,7 +4,7 @@ import json
 
 from src.Simulator.ScalarField import ScalarField
 
-with open('config.json') as config_file:
+with open('../config.json') as config_file:
     config = json.load(config_file)
 
 

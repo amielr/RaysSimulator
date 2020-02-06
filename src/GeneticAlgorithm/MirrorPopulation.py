@@ -3,13 +3,13 @@ import numpy as np
 from src.GeneticAlgorithm.MirrorCreature import MirrorCreature
 import json
 
-with open('config.json') as config_file:
+with open('../config.json') as config_file:
     config = json.load(config_file)
 
 
 def crossover(dna1, dna2):
     dna = dna1
-    dna = [dna[i] + x for i, x in enumerate(dna2)]
+    dna = [(dna[i] + x)/2 for i, x in enumerate(dna2)]
     return dna
 
 
@@ -29,7 +29,9 @@ class MirrorPopulation:
         self._population = [MirrorCreature() for x in range(config["population_size"])]
 
     def simulate(self):
-        [mirror.simulate() for mirror in self._population]
+        for index, mirror in enumerate(self._population):
+            print("Mirror #"+str(index))
+            mirror.simulate()
 
     def get_best(self):
         return self._best

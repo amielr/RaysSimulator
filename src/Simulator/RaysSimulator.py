@@ -6,7 +6,7 @@ from src.Simulator.WignerFunction import wigner_transform
 from src.Simulator.RayPropogation import *
 import json
 
-with open('config.json') as config_file:
+with open('../config.json') as config_file:
     config = json.load(config_file)
 
 
@@ -82,34 +82,32 @@ def error_value_calc(screenRays):
 
     aggregatedError = 0
     for ray in screenRays:
+        aggregatedError += (ray.getAmplitude() * (ray.getOrigin() - idealPoint).length()) ** 2
 
-        aggregatedError += ray.getAmplitude() * math.sqrt((ray.getOrigin() - idealPoint)**2)
+    return math.sqrt(aggregatedError) / len(screenRays)
 
-    return aggregatedError / len(screenRays)
-
-
-mirrorBorders, mirrorInterpolatedBuilder = create_interpolated_mirror(
-    np.zeros([config["mirrorGridDensity"], config["mirrorGridDensity"]]))
 
 lightSource = generate_light_source()
-
-
-print(lightSource[1][:,0])
-
 zwignerFunction = wigner_transform(lightSource)
-
 zwignerTranslatedFunction = ray_translated(zwignerFunction, 50)
 
-reverseFunction = integrate_intensity_wig(zwignerFunction, lightSource)
-# plot_gridata(reverseFunction)
 
-screenRays = ray_propogation(zwignerFunction, zwignerTranslatedFunction, lightSource, mirrorInterpolatedBuilder,
-                               mirrorBorders)
+def simulateMirror(mirrorCorrections):
+    mirrorBorders, mirrorInterpolatedBuilder = create_interpolated_mirror(mirrorCorrections)
 
-error = error_value_calc(screenRays)
+    # reverseFunction = integrate_intensity_wig(zwignerFunction, lightSource)
+    # plot_gridata(reverseFunction)
 
-print(error)
+    screenRays = ray_propogation(zwignerFunction,
+                                 zwignerTranslatedFunction,
+                                 lightSource,
+                                 mirrorInterpolatedBuilder,
+                                 mirrorBorders)
 
-# plot_3d_to_2d(zwignerFunction[0][midPoint][1], zwignerFunction[0][midPoint][2], zwignerFunction[0][midPoint][0])
+    error = error_value_calc(screenRays)
 
-# plot_scatter(rayobject, 14, 15, 16)
+    return error
+
+    # plot_3d_to_2d(zwignerFunction[0][midPoint][1], zwignerFunction[0][midPoint][2], zwignerFunction[0][midPoint][0])
+
+    # plot_scatter(rayobject, 14, 15, 16)

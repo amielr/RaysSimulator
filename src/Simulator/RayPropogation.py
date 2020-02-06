@@ -4,7 +4,7 @@ import numpy as np
 from src.Simulator.MirrorIntersectionFunctions import *
 from src.Simulator.Ray import Ray
 
-with open('config.json') as config_file:
+with open('../config.json') as config_file:
     config = json.load(config_file)
 
 
@@ -89,8 +89,8 @@ def convert_rays_to_objects(stackedRays):
     # print(rayList[45].getAmplitude())
     # print(Ray.getNumberOfRays)
     # print(Ray.number_of_rays)
-    print("number of rays are:")
-    print(len(rayList))
+    # print("number of rays are:")
+    # print(len(rayList))
     return rayList
 
 
@@ -125,7 +125,7 @@ def build_intersections_with_mirror(rayList, mirrorInterpolator, mirrorBorders):
             reflectedRay = Ray(mirrorHitPoint, reflectedRayDirection, ray.getAmplitude())
             reflectedRayList.append(reflectedRay)
 
-    print("end mirror intersection")
+    # print("end mirror intersection")
 
     return reflectedRayList
 

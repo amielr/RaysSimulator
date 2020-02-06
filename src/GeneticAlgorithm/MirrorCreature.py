@@ -1,8 +1,13 @@
 import random
 import json
+import numpy as np
 
-with open('config.json') as config_file:
+from src.Simulator.RaysSimulator import simulateMirror
+
+with open('../config.json') as config_file:
     config = json.load(config_file)
+
+mirrorGridDensity = config["mirrorGridDensity"]
 
 
 def random_integer():
@@ -17,7 +22,7 @@ class MirrorCreature:
     def __init__(self, dna=None):
         self._dna = dna
         if not self._dna:
-            self._dna = [random_integer() for x in range(30)]
+            self._dna = [random_integer() for _ in np.zeros(config["mirrorGridDensity"] ** 2)]
 
     def get_picked_probability(self):
         return self._picked_probability
@@ -36,9 +41,10 @@ class MirrorCreature:
     def set_picked_probability(self, probability):
         self._picked_probability = probability
 
-    def calculate_fitness(self):
-        self._fitness = random.random()
+    def calculate_fitness(self, error):
+        self._fitness = -error
 
     def simulate(self):
-        # evaluate mirror performance
-        self.calculate_fitness()
+        error = simulateMirror(np.array(self._dna).reshape((config["mirrorGridDensity"], config["mirrorGridDensity"])))
+        print(error)
+        self.calculate_fitness(error)

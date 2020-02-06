@@ -9,6 +9,6 @@ while True:
     mirrors.set_population(new_population)
 
     print("Generation number: " + str(index))
-    print(''.join(mirrors.get_best().get_dna()))
+    print(mirrors.get_best().get_fitness())
     print()
     index += 1
