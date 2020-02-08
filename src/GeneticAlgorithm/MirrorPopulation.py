@@ -30,7 +30,7 @@ class MirrorPopulation:
 
     def simulate(self):
         for index, mirror in enumerate(self._population):
-            print("Mirror #"+str(index))
+            # print("Mirror #"+str(index))
             mirror.simulate()
 
     def get_best(self):

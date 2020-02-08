@@ -19,29 +19,14 @@ def plot_3d_to_2d(X, Y, Z):
     plt.show()
 
 
-def plot_scatter(raysobject, a, b, c):
-    X = []
-    Y = []
-    Z = []
-    for rayholder in raysobject:  # for each function row of rays
+def plot_scatter(rays):
+    raysY = [ray.getOrigin().getY() for ray in rays]
+    raysZ = [ray.getOrigin().getZ() for ray in rays]
 
-        for i in range(len(rayholder[0])):
-            mx = rayholder[a][i]  # - rayholder[0][i]
-            ny = rayholder[b][i]  # - rayholder[1][i]
-            oz = rayholder[c][i]  # - rayholder[2][i]
-            X.append(mx)
-            Y.append(ny)
-            Z.append(oz)
-
-    ax = plt.axes(projection='3d')
-
-    ax.scatter(X, Y, Z, c='r', marker='o', s=0.1)
-
-    ax.set_title('surface')
-
-    plt.xlabel("x axis")
-    plt.ylabel("y axis")
-    plt.clabel("z axis")
+    plt.clf()
+    plt.axis([-20, 20, 360, 400])
+    plt.scatter(raysY, raysZ, c='r', marker='o', s=0.1)
+    plt.pause(0.05)
     plt.show()
 
 

@@ -78,13 +78,21 @@ def ray_translated(wignerobject, dist):
 
 
 def error_value_calc(screenRays):
-    idealPoint = Vector(-200, 0, 180)
+    idealPoint = Vector(-200, 0, 380)
 
-    aggregatedError = 0
+    meanDistance = 0
     for ray in screenRays:
-        aggregatedError += (ray.getAmplitude() * (ray.getOrigin() - idealPoint).length()) ** 2
+        meanDistance += ray.getAmplitude() * (ray.getOrigin() - idealPoint).length()
 
-    return math.sqrt(aggregatedError) / len(screenRays)
+    meanDistance = meanDistance / len(screenRays)
+
+    variance = 0
+    for ray in screenRays:
+        variance += (ray.getAmplitude() * (ray.getOrigin() - idealPoint).length()) ** 2
+
+    variance = math.sqrt(variance) / len(screenRays)
+
+    return variance + meanDistance
 
 
 lightSource = generate_light_source()
@@ -92,7 +100,7 @@ zwignerFunction = wigner_transform(lightSource)
 zwignerTranslatedFunction = ray_translated(zwignerFunction, 50)
 
 
-def simulateMirror(mirrorCorrections):
+def simulateMirror(mirrorCorrections, plot):
     mirrorBorders, mirrorInterpolatedBuilder = create_interpolated_mirror(mirrorCorrections)
 
     # reverseFunction = integrate_intensity_wig(zwignerFunction, lightSource)
@@ -104,10 +112,9 @@ def simulateMirror(mirrorCorrections):
                                  mirrorInterpolatedBuilder,
                                  mirrorBorders)
 
+    if plot:
+        plot_scatter(screenRays)
+
     error = error_value_calc(screenRays)
 
     return error
-
-    # plot_3d_to_2d(zwignerFunction[0][midPoint][1], zwignerFunction[0][midPoint][2], zwignerFunction[0][midPoint][0])
-
-    # plot_scatter(rayobject, 14, 15, 16)

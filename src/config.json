@@ -26,7 +26,7 @@
   "yMirrorScale": -225,
 
   "mirrorErrorValue": 0.1,
-  "lightSourceDensity": 15,
+  "lightSourceDensity": 10,
   "mirrorGridDensity": 31,
   "mirrorDimensions": 150,
   "mirrorOffsetFromSource": 450,
