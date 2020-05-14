@@ -2,6 +2,9 @@ import numpy as np
 from scipy.linalg import circulant
 from scipy.fftpack import fft
 
+from src.Simulator.Ray import Ray
+from src.Simulator.Vector import Vector
+
 
 def get_fourier_frequencies(wignerFunction):
     frequencies = np.fft.fftfreq(len(wignerFunction))
@@ -28,20 +31,21 @@ def prep_corr_matrix_from_vector(vector):
     return iteratedmatrix
 
 
-def wigner_function(scalarField, space, frequencies):
-    corrMatrix = prep_corr_matrix_from_vector(scalarField)
+def wigner_function(scalarArray, suitedCoordinate, space, frequencies):
+    corrMatrix = prep_corr_matrix_from_vector(scalarArray)
     wignerDist = fourier_each_vector(corrMatrix)
-    wignerAmplitude = np.ravel(wignerDist)
-    wignerSpace = np.ravel(space)
-    wignerFreqKValue = np.ravel(frequencies)
 
-    wignerblock = np.stack((wignerAmplitude, wignerSpace, wignerFreqKValue))
-    rows = wignerDist.shape[0]  # space
-    cols = wignerDist.shape[1]  # phase
-    shape = -1, rows, cols
-    wignerblock = np.reshape(wignerblock, shape)
+    rayList = []
 
-    return wignerblock
+    for wignerRow in range(len(wignerDist)):
+        for wignerColumn in range(len(wignerDist[wignerRow])):
+            origin = Vector(space[wignerColumn], suitedCoordinate, 0)
+            direction = Vector(frequencies[wignerRow], 0, 1)
+            amplitude = wignerDist[wignerRow][wignerColumn]
+            ray = Ray(origin, direction, amplitude)
+            rayList.append(ray)
+
+    return rayList
 
 
 def fit_axis(axis):
@@ -53,26 +57,24 @@ def apply_wigner_along_axis(scalarField, axis):
 
     axisFrequencies = get_fourier_frequencies(axisUpSample)
 
-    axisSpaceGrid, axisFrequenciesGrid = np.meshgrid(axisUpSample, axisFrequencies)
+    rayList = []
 
-    return np.apply_along_axis(wigner_function, axis=1, arr=scalarField, space=axisSpaceGrid,
-                               frequencies=axisFrequenciesGrid)
+    for index in range(len(scalarField)):
+        array = scalarField[index]
+        rays = wigner_function(array, axisUpSample[index] * 2 - axisUpSample[0], axisUpSample, axisFrequencies)
+        rayList.append(rays)
+
+    return [item for sublist in rayList for item in sublist]
 
 
-def wigner_transform(lightSource):
-    lightSourceStrength = lightSource[2]
-    rowSpatialLayout = lightSource[0][0, :]
-    rowsWignerTransform = apply_wigner_along_axis(lightSourceStrength, rowSpatialLayout)
-
-    lightSourceStrength = lightSource[2].T
-    columnsSpatialLayout = lightSource[1][:, 0]
-    columnsWignerTransform = apply_wigner_along_axis(lightSourceStrength, columnsSpatialLayout)
-
-    rowWVD = np.ravel(rowsWignerTransform)
-    colWVD = np.ravel(columnsWignerTransform)
-
-    wignerobject = np.stack((rowWVD, colWVD))
-    a, b, c, d = columnsWignerTransform.shape[0], columnsWignerTransform.shape[1], columnsWignerTransform.shape[2], columnsWignerTransform.shape[3]
-    wignerobject = np.reshape(wignerobject, (-1, a, b, c, d))
-
-    return wignerobject
+def wigner_transform(lightSource, xVec, yVec):
+    rowsWignerTransform = apply_wigner_along_axis(lightSource, xVec)
+    columnsWignerTransform = apply_wigner_along_axis(lightSource.T, yVec)
+    columnsWignerTransform = [Ray(Vector(ray.getOrigin().getY(),
+                                         ray.getOrigin().getX(),
+                                         ray.getOrigin().getZ()),
+                                  Vector(ray.getDirection().getY(),
+                                         ray.getDirection().getX(),
+                                         ray.getDirection().getZ()
+                                         ), ray.amplitude) for ray in columnsWignerTransform]
+    return rowsWignerTransform + columnsWignerTransform
