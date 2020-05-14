@@ -1,6 +1,7 @@
 import json
 import numpy as np
 
+
 from src.Simulator.MirrorIntersectionFunctions import *
 from src.Simulator.Ray import Ray
 

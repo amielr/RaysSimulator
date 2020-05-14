@@ -22,6 +22,7 @@ while True:
 
     print("Generation number: " + str(index))
     print(mirrors.get_best().get_fitness())
-    mirrors.get_best().simulate(plot=True)
+    if (index % 10) == 0:
+        mirrors.get_best().simulate(plot=True)
     print()
     index += 1

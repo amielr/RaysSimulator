@@ -1,6 +1,11 @@
 import numpy as np
-from scipy import interpolate
+from scipy import interpolate, special, constants
 import json
+import math
+from src.Simulator import PlotFunctions
+import numpy.polynomial.hermite as Hermite
+
+
 
 from src.Simulator.ScalarField import ScalarField
 
@@ -8,13 +13,38 @@ with open('../config.json') as config_file:
     config = json.load(config_file)
 
 
+def gauss_beam(x, y, z, E0, w0, wz, zr, Rz, k):
+
+    beam = E0*(w0/wz)*math.exp(-(x**2+y**2)/wz**2)*math.exp(1j*(k*z)-np.arctan(z/zr)+k*((x**2+y**2)/(2*Rz)))
+
+    return beam
+
 def generate_light_source():
-    xGrid, yGrid = np.meshgrid(np.linspace(-10, 10, config["lightSourceDensity"]),
-                               np.linspace(-10, 10, config["lightSourceDensity"]))
+    xGrid, yGrid = np.meshgrid(np.linspace(0, 7.5, config["lightSourceDensity"]),
+                               np.linspace(0, 5, config["lightSourceDensity"]))
 
     pulse2d = np.where(abs(xGrid) <= 4, 1, 0) & np.where(abs(yGrid) <= 3, 1, 0)
 
-    return np.stack((xGrid, yGrid, pulse2d))
+    nMode, mMode = 2, 2
+    aXDimension, bYDimension = 7.5, 5
+    z = 0
+    frequency = 2.9*pow(10, 12)
+
+    permiabilitymue = constants.mu_0
+    permittivity = constants.epsilon_0
+    omega = 2*np.pi*frequency
+
+    kc = np.sqrt(np.square(nMode*np.pi/aXDimension)+np.square(mMode*np.pi/bYDimension))
+
+    Beta = np.sqrt(omega*permiabilitymue*permittivity-kc)
+
+    TM_ElectricZ_Field = np.square(np.sin(mMode*np.pi*xGrid/aXDimension)*np.sin(nMode*np.pi*yGrid/bYDimension))#*np.square(math.exp(-1j*Beta*z))
+
+
+
+    PlotFunctions.plot_3d_to_2d(xGrid, yGrid, TM_ElectricZ_Field)
+
+    return np.stack((xGrid, yGrid, TM_ElectricZ_Field))
 
 
 def create_interpolated_mirror(mirrorCorrections):
