@@ -7,8 +7,7 @@ class Ray:
     direction = Vector(0, 0, 0)
     amplitude = 0
 
-    def __init__(self, _origin, _direction, _amplidute):
-
+    def __init__(self, _origin=Vector(0, 0, 0), _direction=Vector(0, 0, 0), _amplidute=0):
         self.origin = _origin
 
         self.direction = _direction
@@ -37,5 +36,3 @@ class Ray:
 
     def setDirection(self, _dx, _dy, _dz):
         self.direction = Vector(_dx, _dy, _dz)
-
-

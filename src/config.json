@@ -1,19 +1,23 @@
 {
-  "population_size": 100,
+  "population_size": 1000,
   "best_percent": 0.1,
-  "mutation_rate": 0.01,
+  "mutation_rate": 0.03,
 
   "xScreenLocation": -200,
   "yScreenLocation": 0,
   "zScreenLocation": 450,
 
-  "xMirrorScale": -225,
-  "yMirrorScale": -225,
+  "xMirrorScale": -22.5,
+  "yMirrorScale": -22.5,
 
   "mirrorErrorValue": 0.1,
+<<<<<<< HEAD
   "lightSourceDensity": 50,
+=======
+  "lightSourceDensity": 5,
+>>>>>>> CR_Fix
   "mirrorGridDensity": 31,
-  "mirrorDimensions": 150,
+  "mirrorDimensions": 15,
   "mirrorOffsetFromSource": 450,
 
   "mirrorRotationAngle": 45,

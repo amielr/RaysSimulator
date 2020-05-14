@@ -3,31 +3,43 @@ from mpl_toolkits import mplot3d
 import matplotlib
 from scipy.interpolate import griddata
 import numpy as np
+
 matplotlib.use('TkAgg')
 
 
-def plot_3d_to_2d(X, Y, Z):
+def plot_mirror(mirrorBorders, mirrorInterpolatedBuilder):
+    x_axis = np.arange(mirrorBorders[0, 1], mirrorBorders[0, 0], 1)
+    y_axis = np.arange(mirrorBorders[1, 1], mirrorBorders[1, 0], 1)
+
+    X, Y = np.meshgrid(x_axis, y_axis)
+
+    Z = mirrorInterpolatedBuilder(x_axis, y_axis)
+
+    plt.figure(1)
+    plt.clf()
     ax = plt.axes(projection='3d')
 
-    ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap='viridis', edgecolor='none')
+    ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap='viridis', edgecolor='none', linewidth=0)
 
     ax.set_title('')
 
     plt.xlabel("x axis")
     plt.ylabel("y axis")
     plt.clabel("z axis")
-    plt.show()
+    plt.show(block=False)
+    plt.pause(1)
 
 
 def plot_scatter(rays):
+    raysX = [ray.getOrigin().getX() for ray in rays]
     raysY = [ray.getOrigin().getY() for ray in rays]
-    raysZ = [ray.getOrigin().getZ() for ray in rays]
 
+    plt.figure(2)
     plt.clf()
-    plt.axis([-20, 20, 360, 400])
-    plt.scatter(raysY, raysZ, c='r', marker='o', s=0.1)
-    plt.pause(0.05)
-    plt.show()
+    plt.axis([-200, 200, 300, 600])
+    plt.scatter(raysX, raysY, c='r', marker='o', s=0.1)
+    plt.show(block=False)
+    plt.pause(1)
 
 
 def plot_gridata(functiondata):
