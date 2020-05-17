@@ -3,9 +3,10 @@ import math
 from src.Simulator.FunctionSources import generate_light_source, create_interpolated_mirror
 from src.Simulator.WignerFunction import wigner_transform
 from src.Simulator.RayPropogation import *
+from src.Simulator.PlotFunctions import *
 import json
 
-with open('config.json') as config_file:
+with open('../config.json') as config_file:
     config = json.load(config_file)
 
 
@@ -31,6 +32,9 @@ def error_value_calc(screenRays):
 
 xVec, yVec, lightSource = generate_light_source()
 rays = wigner_transform(lightSource, xVec, yVec)
+
+plot_wigner(rays)
+
 rayList = np.array(rays)
 
 # plot_scatter(rayList)

@@ -6,7 +6,7 @@ from src.GeneticAlgorithm.MirrorPopulation import MirrorPopulation
 
 
 def startSimulation():
-    with open('config.json') as config_file:
+    with open('../config.json') as config_file:
         config = json.load(config_file)
 
     mirrorGridDensity = config["mirrorGridDensity"]
@@ -24,17 +24,16 @@ def startSimulation():
         new_population = mirrors.next_generation()
         mirrors.set_population(new_population)
 
-<<<<<<< HEAD
+
     print("Generation number: " + str(index))
     print(mirrors.get_best().get_fitness())
     if (index % 10) == 0:
         mirrors.get_best().simulate(plot=True)
     print()
     index += 1
-=======
-        print("Generation number: " + str(index))
-        print(mirrors.get_best().get_fitness())
-        # mirrors.get_best().simulate(plot=True)
-        print()
-        index += 1
->>>>>>> CR_Fix
+    print("Generation number: " + str(index))
+    print(mirrors.get_best().get_fitness())
+    # mirrors.get_best().simulate(plot=True)
+    print()
+    index += 1
+

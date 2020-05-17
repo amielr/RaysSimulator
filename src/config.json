@@ -11,11 +11,7 @@
   "yMirrorScale": -22.5,
 
   "mirrorErrorValue": 0.1,
-<<<<<<< HEAD
-  "lightSourceDensity": 50,
-=======
-  "lightSourceDensity": 5,
->>>>>>> CR_Fix
+  "lightSourceDensity": 11,
   "mirrorGridDensity": 31,
   "mirrorDimensions": 15,
   "mirrorOffsetFromSource": 450,

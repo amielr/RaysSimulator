@@ -6,7 +6,7 @@ from numba import njit, jit, prange
 from src.Simulator.MirrorIntersectionFunctions import *
 from src.Simulator.Ray import Ray
 
-with open('config.json') as config_file:
+with open('../config.json') as config_file:
     config = json.load(config_file)
 
 

@@ -4,7 +4,7 @@ import numpy as np
 
 from src.Simulator.RaysSimulator import simulateMirror
 
-with open('config.json') as config_file:
+with open('../config.json') as config_file:
     config = json.load(config_file)
 
 mirrorGridDensity = config["mirrorGridDensity"]
