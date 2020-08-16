@@ -1,12 +1,11 @@
 import json
 import numpy as np
-from numba import njit, jit, prange
-
+from numba import njit, jit, prange, vectorize
 
 from src.Simulator.MirrorIntersectionFunctions import *
 from src.Simulator.Ray import Ray
 
-with open('../config.json') as config_file:
+with open('config.json') as config_file:
     config = json.load(config_file)
 
 
@@ -104,7 +103,7 @@ def build_ray_object_list_from_wigner(wignerTransform, translatedWignerTransform
     return convert_rays_to_objects(stacked_ray_list)
 
 
-# @jit(parallel=True)
+@jit(parallel=True)
 def build_intersections_with_mirror(rayList, mirrorInterpolator, mirrorBorders, errorValue):
     reflectedRayList = np.array([Ray() for x in range(rayList.size)])
 
@@ -121,6 +120,17 @@ def build_intersections_with_mirror(rayList, mirrorInterpolator, mirrorBorders, 
     # print("end mirror intersection")
 
     return reflectedRayList
+
+
+@vectorize(['Ray(Ray)'], target='cuda')
+def intersect_with_mirror_parrallelly(ray, mirrorInterpolator, mirrorBorders, errorValue):
+    mirrorHitPoint = get_ray_mirror_intersection_point(errorValue, mirrorInterpolator, ray)
+
+    if is_ray_in_mirror_bounds(mirrorHitPoint, mirrorBorders):
+        reflectedRayDirection = get_reflected_ray_from_mirror(mirrorHitPoint, mirrorInterpolator, ray)
+        return Ray(mirrorHitPoint, reflectedRayDirection, ray.getAmplitude())
+
+    return None
 
 
 # @jit(parallel=True)

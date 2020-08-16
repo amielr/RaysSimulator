@@ -5,7 +5,7 @@ from scipy.interpolate import griddata
 import numpy as np
 import json
 
-with open('../config.json') as config_file:
+with open('config.json') as config_file:
     config = json.load(config_file)
 
 matplotlib.use('TkAgg')

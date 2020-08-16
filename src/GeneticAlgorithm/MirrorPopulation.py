@@ -3,7 +3,7 @@ import numpy as np
 from src.GeneticAlgorithm.MirrorCreature import MirrorCreature
 import json
 
-with open('../config.json') as config_file:
+with open('config.json') as config_file:
     config = json.load(config_file)
 
 
