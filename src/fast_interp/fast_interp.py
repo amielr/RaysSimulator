@@ -381,7 +381,7 @@ def _interp2d_k3(f, xout, yout, fout, a, h, n, p, o, lb, ub):
             for j in range(4):
                 iyj = (iy + j) % n[1] if p[1] else iy + j
                 fout[mi] += f[ixi,iyj]*asx[i]*asy[j]
-@numba.njit(parallel=True)
+# @numba.njit(parallel=True)
 def _interp2d_k5(f, xout, yout, fout, a, h, n, p, o, lb, ub):
     m = fout.shape[0]
     for mi in numba.prange(m):
@@ -415,7 +415,7 @@ def _interp2d_k5(f, xout, yout, fout, a, h, n, p, o, lb, ub):
             for j in range(6):
                 iyj = (iy + j) % n[1] if p[1] else iy + j
                 fout[mi] += f[ixi,iyj]*asx[i]*asy[j]
-@numba.njit(parallel=True)
+# @numba.njit(parallel=True)
 def _interp2d_k7(f, xout, yout, fout, a, h, n, p, o, lb, ub):
     m = fout.shape[0]
     for mi in numba.prange(m):

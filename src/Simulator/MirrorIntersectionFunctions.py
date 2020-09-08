@@ -21,8 +21,8 @@ def return_vector_properties(allRaysFromLine, rayNumber):
 
 
 def is_ray_in_mirror_bounds(mirrorHitPoint, mirrorBorders):
-    return mirrorBorders[0, 0] > mirrorHitPoint.getX() > mirrorBorders[0, 1] and\
-           mirrorBorders[1, 0] > mirrorHitPoint.getY() > mirrorBorders[1, 1]
+    return mirrorBorders[0] < mirrorHitPoint.getX() < mirrorBorders[2] and\
+           mirrorBorders[1] < mirrorHitPoint.getY() < mirrorBorders[3]
 
 
 def get_ray_mirror_intersection_point(wantedError, mirror_interp, ray):

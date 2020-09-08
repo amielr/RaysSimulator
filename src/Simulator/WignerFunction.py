@@ -70,6 +70,7 @@ def apply_wigner_along_axis(scalarField, axis):
 def wigner_transform(lightSource, xVec, yVec):
     rowsWignerTransform = apply_wigner_along_axis(lightSource, xVec)
     columnsWignerTransform = apply_wigner_along_axis(lightSource.T, yVec)
+
     columnsWignerTransform = [Ray(Vector(ray.getOrigin().getY(),
                                          ray.getOrigin().getX(),
                                          ray.getOrigin().getZ()),
@@ -77,4 +78,8 @@ def wigner_transform(lightSource, xVec, yVec):
                                          ray.getDirection().getX(),
                                          ray.getDirection().getZ()
                                          ), ray.amplitude) for ray in columnsWignerTransform]
-    return rowsWignerTransform + columnsWignerTransform
+
+    allRaysFromWigner = rowsWignerTransform + columnsWignerTransform
+    nonZeroRays = [ray for ray in allRaysFromWigner if ray.getAmplitude() > 0]
+
+    return nonZeroRays

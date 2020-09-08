@@ -30,10 +30,13 @@
 #
 # run_test()
 
-import matplotlib
-matplotlib.use('TkAgg')
-import matplotlib.pyplot as plt
-plt.interactive(False)
-import numpy as np
-plt.hist(np.random.randn(100))
-plt.show()
+# import matplotlib
+# matplotlib.use('TkAgg')
+# import matplotlib.pyplot as plt
+# plt.interactive(False)
+# import numpy as np
+# plt.hist(np.random.randn(100))
+# plt.show()
+from src.GeneticAlgorithm.GAManager import startSimulation
+
+startSimulation()

@@ -31,19 +31,22 @@ def create_interpolated_mirror(mirrorCorrections):
     direction = config["mirrorRotationDirection"]
     korder = config["TaylorOrder"]
 
-
-    axis, vertexDistance = np.linspace(-mirrorDimensions, mirrorDimensions, mirrorGridDensity, endpoint=True, retstep=True)
+    axis, vertexDistance = np.linspace(-mirrorDimensions, mirrorDimensions, mirrorGridDensity, endpoint=False,retstep=True)
 
     xGrid, yGrid = np.meshgrid(axis, axis)
     # mirrorBaseShape = (xGrid ** 2) / xMirrorScale + (yGrid ** 2) / yMirrorScale
-    mirrorBaseShape = np.ones(mirrorGridDensity * mirrorGridDensity).reshape((mirrorGridDensity, mirrorGridDensity))
-    mirrorShape = mirrorBaseShape + mirrorCorrections
+    mirrorBaseShape = np.zeros(mirrorGridDensity * mirrorGridDensity).reshape((mirrorGridDensity, mirrorGridDensity))
+    mirrorShape = mirrorBaseShape
 
     field = ScalarField(xGrid, yGrid, mirrorShape)
     field.apply_rotation(angle, direction)
     field.add_offset(mirrorOffsetFromSource)
+    field.add_offset(mirrorCorrections)
 
-    interpolatedMirrorBuilder = interp2d(field.getMinBoundary(), field.getMaxBoundary(), [vertexDistance, vertexDistance], field.zScalarField, k=korder)
+    vertexDistanceX = (field.xGrid.max()-field.xGrid.min())/(field.xGrid[0,:].size-2)
+    vertexDistanceY = (field.yGrid.max()-field.yGrid.min())/(field.yGrid[:,0].size-2)
+    interpolatedMirrorBuilder = interp2d(field.getMinBoundary(), field.getMaxBoundary(), [vertexDistanceX, vertexDistanceY], field.zScalarField.T, k=korder)
+    # interpolatedMirrorBuilder = interpolate.interp2d(field.xGrid[0,:], field.yGrid[:,0], field.zScalarField, kind='cubic')
 
     mirrorBorders = field.getMinBoundary() + field.getMaxBoundary()
 

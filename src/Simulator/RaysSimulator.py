@@ -3,7 +3,7 @@ import math
 from src.Simulator.FunctionSources import generate_light_source, create_interpolated_mirror
 from src.Simulator.WignerFunction import wigner_transform
 from src.Simulator.RayPropogation import *
-# from src.Simulator.PlotFunctions import *
+from src.Simulator.PlotFunctions import *
 import json
 
 with open('config.json') as config_file:
@@ -44,15 +44,15 @@ rayList = np.array(rays)
 def simulateMirror(mirrorCorrections, plot):
     mirrorBorders, mirrorInterpolatedBuilder = create_interpolated_mirror(mirrorCorrections)
 
-    # if plot:
-    #     plot_mirror(mirrorBorders, mirrorInterpolatedBuilder)
+    if plot:
+        plot_mirror(mirrorBorders, mirrorInterpolatedBuilder)
 
     screenRays = ray_propogation(rayList,
                                  mirrorInterpolatedBuilder,
                                  mirrorBorders)
 
-    # if plot:
-    #     plot_scatter(screenRays)
+    if plot:
+        plot_heatmap(screenRays)
 
     error = error_value_calc(screenRays)
 

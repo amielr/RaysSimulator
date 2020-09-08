@@ -32,6 +32,7 @@ class MirrorPopulation:
         for index, mirror in enumerate(self._population):
             # print("Mirror #"+str(index))
             mirror.simulate()
+            print(str(index) + " : " + str(mirror.get_fitness()))
 
     def get_best(self):
         return self._best

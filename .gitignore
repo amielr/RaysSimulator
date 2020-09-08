@@ -11,3 +11,5 @@ src/GeneticAlgorithm/__pycache__/
 src/Simulator/__pycache__/
 
 venv/
+
+src/fast_interp/__pycache__/

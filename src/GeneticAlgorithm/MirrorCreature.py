@@ -12,7 +12,7 @@ mutationRate = config["mutation_rate"]
 
 
 def random_integer():
-    return random.random() * 2 - 1
+    return random.random() * 0.6 - 0.3
 
 
 class MirrorCreature:
@@ -51,5 +51,4 @@ class MirrorCreature:
     def simulate(self, plot=False):
         mirrorGrid = np.array(self._dna).reshape((mirrorGridDensity, mirrorGridDensity))
         error = simulateMirror(mirrorGrid, plot)
-        print(error)
         self.calculate_fitness(error)
