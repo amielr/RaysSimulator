@@ -1,6 +1,8 @@
 import numpy as np
 from scipy import interpolate
 import json
+from ..fast_interp import interp2d
+
 import math
 
 from src.Simulator.ScalarField import ScalarField
@@ -27,8 +29,10 @@ def create_interpolated_mirror(mirrorCorrections):
     mirrorOffsetFromSource = config["mirrorOffsetFromSource"]
     angle = config["mirrorRotationAngle"]
     direction = config["mirrorRotationDirection"]
+    korder = config["TaylorOrder"]
 
-    axis = np.linspace(-mirrorDimensions, mirrorDimensions, mirrorGridDensity)
+
+    axis, vertexDistance = np.linspace(-mirrorDimensions, mirrorDimensions, mirrorGridDensity, endpoint=True, retstep=True)
 
     xGrid, yGrid = np.meshgrid(axis, axis)
     # mirrorBaseShape = (xGrid ** 2) / xMirrorScale + (yGrid ** 2) / yMirrorScale
@@ -39,7 +43,8 @@ def create_interpolated_mirror(mirrorCorrections):
     field.apply_rotation(angle, direction)
     field.add_offset(mirrorOffsetFromSource)
 
-    interpolatedMirrorBuilder = interpolate.interp2d(axis, axis, field.zScalarField, kind='cubic')
-    mirrorBorders = np.array(([field.xGrid.max(), field.xGrid.min()], [field.yGrid.max(), field.yGrid.min()]))
+    interpolatedMirrorBuilder = interp2d(field.getMinBoundary(), field.getMaxBoundary(), [vertexDistance, vertexDistance], field.zScalarField, k=korder)
+
+    mirrorBorders = field.getMinBoundary() + field.getMaxBoundary()
 
     return mirrorBorders, interpolatedMirrorBuilder

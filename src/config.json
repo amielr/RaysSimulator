@@ -9,6 +9,7 @@
 
   "xMirrorScale": -22.5,
   "yMirrorScale": -22.5,
+  "TaylorOrder": 5,
 
   "mirrorErrorValue": 0.1,
   "lightSourceDensity": 11,
