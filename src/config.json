@@ -12,7 +12,7 @@
   "TaylorOrder": 5,
 
   "mirrorErrorValue": 0.1,
-  "lightSourceDensity": 20,
+  "lightSourceDensity": 11,
   "mirrorGridDensity": 10,
   "mirrorDimensions": 15,
   "mirrorOffsetFromSource": 450,

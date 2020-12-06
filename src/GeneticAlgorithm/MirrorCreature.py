@@ -2,53 +2,65 @@ import random
 import json
 import numpy as np
 
-from src.Simulator.RaysSimulator import simulateMirror
+from src.Simulator.RaysSimulator import simulate_mirror
 
-with open('config.json') as config_file:
+with open('../config.json') as config_file:
     config = json.load(config_file)
 
 mirrorGridDensity = config["mirrorGridDensity"]
 mutationRate = config["mutation_rate"]
+_dna = []
+_picked_probability = 0
+_fitness = 0
 
 
 def random_integer():
     return random.random() * 0.6 - 0.3
 
 
-class MirrorCreature:
-    _dna = []
-    _fitness = 0
-    _picked_probability = 0
+def initiate_mirror_creature(dna=None):
+    _dna = dna
+    if not _dna:
+        _dna = [random_integer() for _ in np.zeros(mirrorGridDensity ** 2)]
+    return _dna
 
-    def __init__(self, dna=None):
-        self._dna = dna
-        if not self._dna:
-            self._dna = [random_integer() for _ in np.zeros(mirrorGridDensity ** 2)]
 
-    def get_picked_probability(self):
-        return self._picked_probability
+def get_fitness():
+    return _fitness
 
-    def get_fitness(self):
-        return self._fitness
 
-    def get_dna(self):
-        return self._dna
+def get_dna():
+    return _dna
 
-    def change_gene(self, index):
-        self._dna[index] += random_integer()
 
-    def mutate(self):
-        for index, gene in enumerate(self._dna):
-            if random.random() < mutationRate:
-                self.change_gene(index)
+def change_gene(dna, index):
+    dna[index] += random_integer()
+    return dna
 
-    def set_picked_probability(self, probability):
-        self._picked_probability = probability
 
-    def calculate_fitness(self, error):
-        self._fitness = -error
+def mutate(dna):
+    for index, gene in enumerate(dna):
+        if random.random() < mutationRate:
+            dna = change_gene(dna, index)
+    return dna
 
-    def simulate(self, plot=False):
-        mirrorGrid = np.array(self._dna).reshape((mirrorGridDensity, mirrorGridDensity))
-        error = simulateMirror(mirrorGrid, plot)
-        self.calculate_fitness(error)
+def get_picked_probability():
+    return _picked_probability
+
+def set_picked_probability_of_mirror(probability):
+    _picked_probability = probability
+
+def calculate_fitness(error):
+    _fitness = -error
+
+
+def simulate_mirror_creature_return_fitness(MirrorDNA, plot=False):
+    mirrorGrid = np.array(MirrorDNA).reshape((mirrorGridDensity, mirrorGridDensity))
+    error = simulate_mirror(mirrorGrid, plot)
+    return calculate_fitness(error)
+
+
+
+
+
+

@@ -1,27 +1,27 @@
 import numpy as np
 import json
 
-from src.GeneticAlgorithm.MirrorCreature import MirrorCreature
-from src.GeneticAlgorithm.MirrorPopulation import MirrorPopulation
+from src.GeneticAlgorithm.MirrorCreature import *
+from src.GeneticAlgorithm.MirrorPopulation import *
 
 
 def startSimulation():
-    with open('config.json') as config_file:
+    with open('../config.json') as config_file:
         config = json.load(config_file)
 
     mirrorGridDensity = config["mirrorGridDensity"]
-    mirrors = MirrorPopulation()
+    mirrors = initiate_mirror_population()
     index = 1
 
-    best = MirrorCreature([0 for _ in np.zeros([mirrorGridDensity**2])])
-    best.simulate(plot=True)
+    bestDNA = initiate_mirror_creature([0 for _ in np.zeros([mirrorGridDensity**2])])
+
     print("Generation number: 0")
-    print(best.get_fitness())
+    print(simulate_mirror_creature_return_fitness(bestDNA, plot=True))  #get from this fitness/error)
     print()
 
     while True:
-        mirrors.simulate()
-        new_population = mirrors.next_generation()
+        mirrorsfitnesses = simulate_mirror_population(mirrors)
+        new_population = next_generation(mirrors, mirrorsfitnesses)
         mirrors.set_population(new_population)
 
         print("Generation number: " + str(index))

@@ -1,22 +1,22 @@
 import numpy as np
-from scipy import interpolate
+from numpy import genfromtxt
 import json
 from ..fast_interp import interp2d
+from src.Simulator.ScalarField import *
 
-import math
-
-from src.Simulator.ScalarField import ScalarField
-
-with open('config.json') as config_file:
+with open('../config.json') as config_file:
     config = json.load(config_file)
 
 
 def generate_light_source():
-    xVec = np.linspace(-10, 10, config["lightSourceDensity"])
-    yVec = np.linspace(-10, 10, config["lightSourceDensity"])
+    xVec = np.linspace(-3.75, 3.75, config["lightSourceDensity"])
+    yVec = np.linspace(-2.5, 2.5, config["lightSourceDensity"])
     xGrid, yGrid = np.meshgrid(xVec, yVec)
 
     pulse2d = np.where(abs(xGrid) <= 4, 1, 0) & np.where(abs(yGrid) <= 3, 1, 0)
+    my_data = genfromtxt('../../Eqxtcsv.csv', delimiter=',')
+
+    print(my_data)
 
     return xVec, yVec, pulse2d
 
@@ -38,16 +38,18 @@ def create_interpolated_mirror(mirrorCorrections):
     mirrorBaseShape = np.zeros(mirrorGridDensity * mirrorGridDensity).reshape((mirrorGridDensity, mirrorGridDensity))
     mirrorShape = mirrorBaseShape
 
-    field = ScalarField(xGrid, yGrid, mirrorShape)
-    field.apply_rotation(angle, direction)
-    field.add_offset(mirrorOffsetFromSource)
-    field.add_offset(mirrorCorrections)
+    mirrorfield = initiateScalarField(xGrid, yGrid, mirrorShape)
+    RotatedMirror = apply_rotation(mirrorfield, angle, direction)
+    #print(RotatedMirror[2])
+    OffsetMirror = add_offset(RotatedMirror, mirrorOffsetFromSource)
+    geneticallyAdjustedMirror = add_offset(OffsetMirror, mirrorCorrections)
 
-    vertexDistanceX = (field.xGrid.max()-field.xGrid.min())/(field.xGrid[0,:].size-2)
-    vertexDistanceY = (field.yGrid.max()-field.yGrid.min())/(field.yGrid[:,0].size-2)
-    interpolatedMirrorBuilder = interp2d(field.getMinBoundary(), field.getMaxBoundary(), [vertexDistanceX, vertexDistanceY], field.zScalarField.T, k=korder)
+    vertexDistanceX = (max(getXGrid(geneticallyAdjustedMirror))-min(getXGrid(geneticallyAdjustedMirror)))/(getXGrid(geneticallyAdjustedMirror).size-2)
+    vertexDistanceY = (max(getYGrid(geneticallyAdjustedMirror))-min(getYGrid(geneticallyAdjustedMirror)))/(getYGrid(geneticallyAdjustedMirror).size-2)
+    print(getZScalarField(geneticallyAdjustedMirror))
+    interpolatedMirrorBuilder = interp2d(getMinBoundary(geneticallyAdjustedMirror), getMaxBoundary(geneticallyAdjustedMirror), [vertexDistanceX, vertexDistanceY], geneticallyAdjustedMirror.T, k=korder)
     # interpolatedMirrorBuilder = interpolate.interp2d(field.xGrid[0,:], field.yGrid[:,0], field.zScalarField, kind='cubic')
 
-    mirrorBorders = field.getMinBoundary() + field.getMaxBoundary()
-
+    mirrorBorders = np.concatenate(([getMinBoundary(geneticallyAdjustedMirror)], [getMaxBoundary(geneticallyAdjustedMirror)]),axis= None)
+    print("our mirror borders are: " + str(mirrorBorders))
     return mirrorBorders, interpolatedMirrorBuilder

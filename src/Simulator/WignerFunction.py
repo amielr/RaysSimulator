@@ -2,8 +2,8 @@ import numpy as np
 from scipy.linalg import circulant
 from scipy.fftpack import fft
 
-from src.Simulator.Ray import Ray
-from src.Simulator.Vector import Vector
+from src.Simulator.Ray import *
+from src.Simulator.Vector import *
 
 
 def get_fourier_frequencies(wignerFunction):
@@ -39,10 +39,10 @@ def wigner_function(scalarArray, suitedCoordinate, space, frequencies):
 
     for wignerRow in range(len(wignerDist)):
         for wignerColumn in range(len(wignerDist[wignerRow])):
-            origin = Vector(space[wignerColumn], suitedCoordinate, 0)
-            direction = Vector(frequencies[wignerRow], 0, 1)
+            origin = np.array([space[wignerColumn], suitedCoordinate, 0])
+            direction = np.array([frequencies[wignerRow], 0, 1])
             amplitude = wignerDist[wignerRow][wignerColumn]
-            ray = Ray(origin, direction, amplitude)
+            ray = np.array([origin, direction, amplitude])
             rayList.append(ray)
 
     return rayList
@@ -71,15 +71,21 @@ def wigner_transform(lightSource, xVec, yVec):
     rowsWignerTransform = apply_wigner_along_axis(lightSource, xVec)
     columnsWignerTransform = apply_wigner_along_axis(lightSource.T, yVec)
 
-    columnsWignerTransform = [Ray(Vector(ray.getOrigin().getY(),
-                                         ray.getOrigin().getX(),
-                                         ray.getOrigin().getZ()),
-                                  Vector(ray.getDirection().getY(),
-                                         ray.getDirection().getX(),
-                                         ray.getDirection().getZ()
-                                         ), ray.amplitude) for ray in columnsWignerTransform]
+    updatedColumnsWignerTransform = []
 
-    allRaysFromWigner = rowsWignerTransform + columnsWignerTransform
-    nonZeroRays = [ray for ray in allRaysFromWigner if ray.getAmplitude() > 0]
+    for counter in range(len(columnsWignerTransform)):
+        ray = columnsWignerTransform[counter]
 
+        orig = np.array([getY(getOrigin(ray)), getX(getOrigin(ray)), getZ(getOrigin(ray))])
+        dire = np.array([getY(getDirection(ray)), getX(getDirection(ray)), getZ(getDirection(ray))])
+        amp = getAmplitude(ray)
+
+        updatedColumnsWignerTransform.append([orig, dire, amp])
+
+    allRaysFromWigner = rowsWignerTransform + updatedColumnsWignerTransform
+
+    nonZeroRays = []
+    for ray in allRaysFromWigner:
+        if getAmplitude(ray) > 0:
+            nonZeroRays.append(ray)
     return nonZeroRays

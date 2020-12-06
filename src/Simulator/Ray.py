@@ -1,38 +1,51 @@
-from src.Simulator.Vector import Vector
+from src.Simulator.Vector import *
+import numpy as np
+from numba import njit
+
+number_of_rays = 0
+origin = np.array([0, 0, 0], dtype=float)
+direction = np.array([0, 0, 0], dtype=float)
+amplitude = 0
+
+# def __init__(self, _origin=Vector(0, 0, 0), _direction=Vector(0, 0, 0), _amplidute=0):
+#     self.origin = _origin
+#
+#     self.direction = _direction
+#
+#     self.setAmplitude(_amplidute)
+#
+#     #Ray.number_of_rays += 1
 
 
-class Ray:
-    number_of_rays = 0
-    origin = Vector(0, 0, 0)
-    direction = Vector(0, 0, 0)
-    amplitude = 0
+def setAmplitude(ray, _amplitude):
+    ray[2] = _amplitude
+    return ray
 
-    def __init__(self, _origin=Vector(0, 0, 0), _direction=Vector(0, 0, 0), _amplidute=0):
-        self.origin = _origin
 
-        self.direction = _direction
+def getAmplitude(ray):
+    #print("inside getAmplitude", ray[2])
+    return ray[2]
 
-        self.setAmplitude(_amplidute)
 
-        Ray.number_of_rays += 1
+def getNumberOfRays(self):
+    return self.number_of_rays
 
-    def setAmplitude(self, _amplitude):
-        self.amplitude = _amplitude
 
-    def getAmplitude(self):
-        return self.amplitude
+@njit(parallel=True)
+def getOrigin(ray):
+    return ray[0]
 
-    def getNumberOfRays(self):
-        return self.number_of_rays
 
-    def getOrigin(self):
-        return self.origin
+@njit(parallel=True)
+def getDirection(ray):
+    return ray[1]
 
-    def getDirection(self):
-        return self.direction
 
-    def setOrigin(self, _x, _y, _z):
-        self.origin = Vector(_x, _y, _z)
+def setOrigin(ray, _x, _y, _z):
+    ray[0] = np.array([_x, _y, _z])
+    return ray
 
-    def setDirection(self, _dx, _dy, _dz):
-        self.direction = Vector(_dx, _dy, _dz)
+
+def setDirection(ray, _dx, _dy, _dz):
+    ray[1] = np.array([_dx, _dy, _dz])
+    return ray

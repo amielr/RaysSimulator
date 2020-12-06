@@ -6,24 +6,24 @@ from src.Simulator.RayPropogation import *
 from src.Simulator.PlotFunctions import *
 import json
 
-with open('config.json') as config_file:
+with open('../config.json') as config_file:
     config = json.load(config_file)
 
 
 def error_value_calc(screenRays):
-    idealPoint = Vector(config["xScreenLocation"],
+    idealPoint = np.array([config["xScreenLocation"],
                         config["yScreenLocation"],
-                        config["zScreenLocation"])
+                        config["zScreenLocation"]])
 
     meanDistance = 0
     for ray in screenRays:
-        meanDistance += ray.getAmplitude() * (ray.getOrigin() - idealPoint).length()
+        meanDistance += getAmplitude(ray) * (getOrigin(ray) - idealPoint).length()
 
     meanDistance = meanDistance / len(screenRays)
 
     variance = 0
     for ray in screenRays:
-        variance += (ray.getAmplitude() * (ray.getOrigin() - idealPoint).length()) ** 2
+        variance += (getAmplitude(ray) * (getOrigin(ray) - idealPoint).length()) ** 2
 
     variance = math.sqrt(variance) / len(screenRays)
 
@@ -33,26 +33,29 @@ def error_value_calc(screenRays):
 xVec, yVec, lightSource = generate_light_source()
 rays = wigner_transform(lightSource, xVec, yVec)
 
-# plot_wigner(rays)
+plot_scatter(rays)
 
 rayList = np.array(rays)
-
-# plot_scatter(rayList)
+print("Our raylist size is: ", rayList.size)
+#plot_scatter(rayList)
 # x = 2
 
 
-def simulateMirror(mirrorCorrections, plot):
+def simulate_mirror(mirrorCorrections, plot):
     mirrorBorders, mirrorInterpolatedBuilder = create_interpolated_mirror(mirrorCorrections)
 
-    if plot:
-        plot_mirror(mirrorBorders, mirrorInterpolatedBuilder)
+    #if plot:
+    #    plot_mirror(mirrorBorders, mirrorInterpolatedBuilder)
 
     screenRays = ray_propogation(rayList,
                                  mirrorInterpolatedBuilder,
                                  mirrorBorders)
 
-    if plot:
-        plot_heatmap(screenRays)
+    #if plot:
+    #    plot_heatmap(screenRays)
+
+#    if plot:
+#        plot_wigner()
 
     error = error_value_calc(screenRays)
 

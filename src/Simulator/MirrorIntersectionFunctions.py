@@ -1,6 +1,7 @@
 import numpy as np
 
-from src.Simulator.Vector import Vector
+from src.Simulator.Vector import *
+from src.Simulator.Ray import *
 
 
 def return_vector_properties(allRaysFromLine, rayNumber):
@@ -14,26 +15,26 @@ def return_vector_properties(allRaysFromLine, rayNumber):
     mx = xEnd - xStart
     ny = yEnd - yStart
     oz = zEnd - zStart
-    v = Vector(mx, ny, oz)
-    v = v * (1 / v.length())
+    v = np.array([mx, ny, oz])
+    v = v * (1 / length(v))
 
-    return Vector(xStart, yStart, zStart), v
+    return np.array([xStart, yStart, zStart]), v
 
 
 def is_ray_in_mirror_bounds(mirrorHitPoint, mirrorBorders):
-    return mirrorBorders[0] < mirrorHitPoint.getX() < mirrorBorders[2] and\
-           mirrorBorders[1] < mirrorHitPoint.getY() < mirrorBorders[3]
+    return mirrorBorders[0] < getX(mirrorHitPoint) < mirrorBorders[2] and\
+           mirrorBorders[1] < getY(mirrorHitPoint) < mirrorBorders[3]
 
 
 def get_ray_mirror_intersection_point(wantedError, mirror_interp, ray):
-    checkpointLocation = ray.getOrigin()
-    currentZ = mirror_interp(checkpointLocation.getX(), checkpointLocation.getY())
-    error = currentZ - checkpointLocation.getZ()
+    checkpointLocation = getOrigin(ray)
+    currentZ = mirror_interp(getX(checkpointLocation), getY(checkpointLocation))
+    error = currentZ - getZ(checkpointLocation)
 
     while abs(error) > wantedError:
-        checkpointLocation = checkpointLocation + ray.getDirection() * error
-        currentZ = mirror_interp(checkpointLocation.getX(), checkpointLocation.getY())
-        error = currentZ - checkpointLocation.getZ()
+        checkpointLocation = checkpointLocation + getDirection(ray) * error
+        currentZ = mirror_interp(getX(checkpointLocation), getY(checkpointLocation))
+        error = currentZ - getZ(checkpointLocation)
 
     return checkpointLocation
 
@@ -41,7 +42,7 @@ def get_ray_mirror_intersection_point(wantedError, mirror_interp, ray):
 def get_reflected_ray_from_mirror(mirrorHitPoint, mirrorInterpolator, ray):
     plane_normal = generate_plane_normal(mirrorHitPoint, mirrorInterpolator)
 
-    reflectedRayDirection = get_reflected_direction(ray.getDirection(), plane_normal)
+    reflectedRayDirection = get_reflected_direction(getDirection(ray), plane_normal)
 
     return reflectedRayDirection
 
@@ -64,13 +65,13 @@ def generate_plane_normal(mirrorHitPoint, mirrorInterpolator):
     p2z = mirrorInterpolator(p2x, p2y)
     p3z = mirrorInterpolator(p3x, p3y)
 
-    p1 = Vector(p1x, p1y, p1z)
-    p2 = Vector(p2x, p2y, p2z)
-    p3 = Vector(p3x, p3y, p3z)
+    p1 = np.array([p1x, p1y, p1z])
+    p2 = np.array([p2x, p2y, p2z])
+    p3 = np.array([p3x, p3y, p3z])
     v1 = p3 - p1
     v2 = p2 - p1
-    cp = v2.cross(v1)
-    cp = cp * (1 / cp.length())
+    cp = np.cross(v1, v2)
+    cp = cp * (1 / cp.size)
     return cp
 
 

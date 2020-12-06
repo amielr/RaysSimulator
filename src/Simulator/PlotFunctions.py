@@ -1,11 +1,18 @@
 import matplotlib.pyplot as plt
-from mpl_toolkits import mplot3d
 import matplotlib
 from scipy.interpolate import griddata
 import numpy as np
 import json
+from matplotlib import cm
+from matplotlib.ticker import LinearLocator
+from src.Simulator.Ray import *
+from src.Simulator.Vector import *
+from mpl_toolkits.mplot3d import Axes3D
 
-with open('config.json') as config_file:
+
+
+
+with open('../config.json') as config_file:
     config = json.load(config_file)
 
 matplotlib.use('TkAgg')
@@ -48,17 +55,21 @@ def plot_mirror(mirrorBorders, mirrorInterpolatedBuilder):
 
 
 def plot_scatter(rays):
-    raysY = np.array([ray.getOrigin().getY() for ray in rays])
-    raysZ = np.array([ray.getOrigin().getZ() for ray in rays])
+
+    raysY = []
+    raysX = []
+    for ray in rays:
+        raysY.append(getY(getOrigin(ray)))
+        raysX.append(getX(getOrigin(ray)))
 
     padding = 5
 
     plt.figure(2)
     plt.clf()
-    plt.axis([raysY.min() - padding, raysY.max() + padding, raysZ.min() - padding, raysZ.max() + padding])
-    plt.scatter(raysY, raysZ, c='r', marker='o', s=[ray.getAmplitude() for ray in rays])
+    plt.axis([min(raysY) - padding, max(raysY) + padding, min(raysX) - padding, max(raysX) + padding])
+    plt.scatter(raysY, raysX, c='r', marker='o', s=[getAmplitude(ray) for ray in rays])
     plt.show(block=False)
-    plt.pause(1)
+    #plt.pause(1)
 
 def plot_heatmap(rays):
     raysY = np.array([ray.getOrigin().getY() for ray in rays])
@@ -76,6 +87,40 @@ def plot_heatmap(rays):
     plt.imshow(heatmap.T, extent=extent, origin='lower')
     plt.show(block=False)
     plt.pause(1)
+
+
+def plot_wigner(row, rays):
+
+
+    [ray for ray in rays]
+
+
+    fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+
+    # Make data.
+    X = np.arange(-5, 5, 0.25)
+    Y = np.arange(-5, 5, 0.25)
+    X, Y = np.meshgrid(X, Y)
+    R = np.sqrt(X ** 2 + Y ** 2)
+    Z = np.sin(R)
+
+    # Plot the surface.
+    surf = ax.plot_surface(X, Y, Z, cmap=cm.coolwarm,
+                           linewidth=0, antialiased=False)
+
+    # Customize the z axis.
+    ax.set_zlim(-1.01, 1.01)
+    ax.zaxis.set_major_locator(LinearLocator(10))
+    # A StrMethodFormatter is used automatically
+    #ax.zaxis.set_major_formatter('{x:.02f}')
+
+    # Add a color bar which maps values to colors.
+    fig.colorbar(surf, shrink=0.5, aspect=5)
+
+    plt.show()
+
+
+
 
 
 def plot_gridata(functiondata):

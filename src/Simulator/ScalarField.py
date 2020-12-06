@@ -27,50 +27,68 @@ def get_rotation_matrix(angle, direction):
     ]
 
 
-class ScalarField:
-    _xGrid, _yGrid, _zScalarField = [], [], []
-    _xMin, _xMax, _yMin, _yMax = 0, 0, 0, 0
 
-    def __init__(self, xGrid, yGrid, zScalarField):
-        self._xGrid = xGrid
-        self._yGrid = yGrid
-        self._zScalarField = zScalarField
-        self.set_mirror_borders()
+_xGrid, _yGrid, _zScalarField = [], [], []
+_xMin, _xMax, _yMin, _yMax = 0, 0, 0, 0
+#
+def initiateScalarField(xGrid, yGrid, zScalarField):
+     _xGrid = xGrid
+     _yGrid = yGrid
+     _zScalarField = zScalarField
+     mirrorBorders = set_mirror_borders(xGrid, yGrid)
+     return np.array([_xGrid, _yGrid, _zScalarField])
 
-    def apply_rotation(self, angle, direction):
-        flattenX, flattenY, flattenZ = np.ravel(self._xGrid), np.ravel(self._yGrid), np.ravel(self._zScalarField)
-        stackFlattenXYZ = np.stack((flattenX, flattenY, flattenZ))
+def apply_rotation(field, angle, direction):
+    flattenX, flattenY, flattenZ = np.ravel(getXGrid(field)), np.ravel(getYGrid(field)), np.ravel(getZScalarField(field))
+    stackFlattenXYZ = np.stack((flattenX, flattenY, flattenZ))
 
-        rotatedXYZ = np.matmul(get_rotation_matrix(angle, direction), stackFlattenXYZ)
+    rotatedXYZ = np.matmul(get_rotation_matrix(angle, direction), stackFlattenXYZ)
 
-        self._xGrid = np.reshape(rotatedXYZ[0], self._xGrid.shape)
-        self._yGrid = np.reshape(rotatedXYZ[1], self._yGrid.shape)
-        self._zScalarField = np.reshape(rotatedXYZ[2], self._zScalarField.shape)
-        self.set_mirror_borders()
+    _xGrid = np.reshape(rotatedXYZ[0], getXGrid(field).shape)
+    _yGrid = np.reshape(rotatedXYZ[1], getYGrid(field).shape)
+    _zScalarField = np.reshape(rotatedXYZ[2], getZScalarField(field).shape)
+    #mirrorborders = set_mirror_borders(field)
+    field = np.array([_xGrid, _yGrid, _zScalarField])
+    return field
 
-    def set_mirror_borders(self):
-        self._xMax = self.xGrid.max()
-        self._xMin = self.xGrid.min()
-        self._yMax = self.yGrid.max()
-        self._yMin = self.yGrid.min()
+def getXGrid(field):
+    return field[0]
 
-    def getMinBoundary(self):
-        return [self._xMin, self._yMin]
+def getYGrid(field):
+    return field[1]
 
-    def getMaxBoundary(self):
-        return [self._xMax, self._yMax]
+def getZScalarField(field):
+    return field[2]
 
-    def add_offset(self, offset):
-        self._zScalarField += offset
 
-    @property
-    def zScalarField(self):
-        return self._zScalarField
+def set_mirror_borders(xGrid, yGrid):
+    _xMax = xGrid.max()
+    _xMin = xGrid.min()
+    _yMax = yGrid.max()
+    _yMin = yGrid.min()
+    return [_xMax, _xMin, _yMax, _yMin]
 
-    @property
-    def xGrid(self):
-        return self._xGrid
+def getMinBoundary(field):
+    set_mirror_borders(field[0], field[1])
+    return np.array([_xMin, _yMin])
 
-    @property
-    def yGrid(self):
-        return self._yGrid
+def getMaxBoundary(field):
+    set_mirror_borders(field[0], field[1])
+    return np.array([_xMax, _yMax])
+
+def add_offset(field, offset):
+    #print(field)
+    adjustedField = field[2] + offset
+    return adjustedField
+
+@property
+def zScalarField(self):
+    return self._zScalarField
+
+@property
+def xGrid(self):
+    return self._xGrid
+
+@property
+def yGrid(self):
+    return self._yGrid

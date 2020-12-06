@@ -1,42 +1,51 @@
 import json
 import numpy as np
-from numba import njit, jit, prange, vectorize
+from numba import njit, jit, prange, vectorize, jitclass
 
 from src.Simulator.MirrorIntersectionFunctions import *
-from src.Simulator.Ray import Ray
+from src.Simulator.Ray import *
 
-with open('config.json') as config_file:
+with open('../config.json') as config_file:
     config = json.load(config_file)
 
-
+@njit(parallel=True)
 def line_plane_collision(planeNormal, ray, epsilon=1e-6):
-    perpendicularFactor = planeNormal.getDirection().dot_product(ray.getDirection())
+    perpendicularFactor = np.dot(getDirection(planeNormal), (getDirection(ray)))
     if abs(perpendicularFactor) < epsilon:
-        return Vector(0, 0, 0)
+        return np.array([0, 0, 0])
 
-    w = planeNormal.getOrigin() - ray.getOrigin()
-    t = planeNormal.getDirection().dot_product(w) / perpendicularFactor
-    return ray.getOrigin() + ray.getDirection() * t
+    w = getOrigin(planeNormal) - getOrigin(ray)
+    t = np.dot(getDirection(planeNormal), w) / perpendicularFactor
+    return getOrigin(ray) + getDirection(ray) * t
 
 
-# @jit(parallel=True)
+#@njit(parallel=True)
 def build_intersections_with_mirror(rayList, mirrorInterpolator, mirrorBorders, errorValue):
-    reflectedRayList = np.array([Ray() for x in range(rayList.size)])
-
-    for rayIndex in range(rayList.size):
-        ray = rayList[rayIndex]
+    reflectedRayList = []
+    for x in range(len(rayList)):
+        reflectedRayList.append(np.array([[origin], [direction], amplitude]))  #this could cause and error
+    print(rayList.size, "our raylist size")
+    print(len(rayList))
+    print(len(rayList[0]))
+    for rayIndex in range(len(rayList)):
+        ray = rayList[rayIndex-1]
         mirrorHitPoint = get_ray_mirror_intersection_point(errorValue, mirrorInterpolator, ray)
 
         if is_ray_in_mirror_bounds(mirrorHitPoint, mirrorBorders):
             reflectedRayDirection = get_reflected_ray_from_mirror(mirrorHitPoint, mirrorInterpolator, ray)
 
-            reflectedRay = Ray(mirrorHitPoint, reflectedRayDirection, ray.getAmplitude())
+            reflectedRay = np.array([mirrorHitPoint], [reflectedRayDirection], getAmplitude(ray))
             reflectedRayList[rayIndex] = reflectedRay
 
-    # print("end mirror intersection")
-
-    nonZeroReflectedRays = reflectedRayList[[ray.getAmplitude() > 0 for ray in reflectedRayList]]
-
+    print("end mirror intersection")
+    print(len(reflectedRayList))
+    nonZeroReflectedRays = []
+    for rayIndex in range(len(reflectedRayList)):
+        ray = rayList[rayIndex-1]
+        #print(getAmplitude(ray))
+        if getAmplitude(ray) > 0:
+            nonZeroReflectedRays.append(ray)
+    print("our nonzeroreflectedrays: ", len(nonZeroReflectedRays))
     return nonZeroReflectedRays
 
 
@@ -46,19 +55,23 @@ def intersect_with_mirror_parrallelly(ray, mirrorInterpolator, mirrorBorders, er
 
     if is_ray_in_mirror_bounds(mirrorHitPoint, mirrorBorders):
         reflectedRayDirection = get_reflected_ray_from_mirror(mirrorHitPoint, mirrorInterpolator, ray)
-        return Ray(mirrorHitPoint, reflectedRayDirection, ray.getAmplitude())
+        return np.array([mirrorHitPoint], [reflectedRayDirection], getAmplitude(ray))
 
     return None
 
 
-# @jit(parallel=True)
+@njit(parallel=True)
 def build_intersections_with_screen(rayList, screenNormal):
-    raysAtScreenList = np.array([Ray() for x in range(rayList.size)])
+    raysAtScreenList = []
+    for x in range(rayList.size):
+        raysAtScreenList.append(np.array([origin], [direction], amplitude))
 
     for rayIndex in range(rayList.size):
         ray = rayList[rayIndex]
         screenPoints = line_plane_collision(screenNormal, ray)
-        rayAtScreen = Ray(screenPoints, ray.getDirection(), ray.getAmplitude())
+        gottenDirection = getDirection(ray)
+        gottenAmplitude = getAmplitude(ray)
+        rayAtScreen = np.array([screenPoints], [gottenDirection], [gottenAmplitude])
         raysAtScreenList[rayIndex] = rayAtScreen
     return raysAtScreenList
 
@@ -67,9 +80,12 @@ def ray_propogation(rayList, mirrorInterpolator, mirrorBorders):
     reflectedRayList = build_intersections_with_mirror(rayList, mirrorInterpolator, mirrorBorders,
                                                        config["mirrorErrorValue"])
 
-    screenNormal = Ray(Vector(config["xScreenLocation"],
+    screenNormal = np.array([config["xScreenLocation"],
                               config["yScreenLocation"],
-                              config["zScreenLocation"]),
-                       Vector(1, 0, 0), 1)
+                              config["zScreenLocation"], [1, 0, 0], 1])
+    # Ray(Vector(config["xScreenLocation"],
+    #                           config["yScreenLocation"],
+    #                           config["zScreenLocation"]),
+    #                    Vector(1, 0, 0), 1)
 
     return build_intersections_with_screen(reflectedRayList, screenNormal)
