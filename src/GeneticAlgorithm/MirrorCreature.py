@@ -19,6 +19,7 @@ def random_integer():
 
 
 def initiate_mirror_creature(dna=None):
+    global _dna
     _dna = dna
     if not _dna:
         _dna = [random_integer() for _ in np.zeros(mirrorGridDensity ** 2)]
@@ -48,10 +49,11 @@ def get_picked_probability():
     return _picked_probability
 
 def set_picked_probability_of_mirror(probability):
+    global _picked_probability
     _picked_probability = probability
 
 def calculate_fitness(error):
-    _fitness = -error
+    return -error
 
 
 def simulate_mirror_creature_return_fitness(MirrorDNA, plot=False):

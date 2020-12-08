@@ -23,29 +23,29 @@ def setAmplitude(ray, _amplitude):
 
 
 def getAmplitude(ray):
-    #print("inside getAmplitude", ray[2])
-    return ray[2]
+    # print("inside getAmplitude", ray[2])
+    return ray[2][0]
 
 
 def getNumberOfRays(self):
     return self.number_of_rays
 
 
-@njit(parallel=True)
+# @njit(parallel=True)
 def getOrigin(ray):
     return ray[0]
 
 
-@njit(parallel=True)
+# @njit(parallel=True)
 def getDirection(ray):
     return ray[1]
 
 
 def setOrigin(ray, _x, _y, _z):
-    ray[0] = np.array([_x, _y, _z])
+    ray[0] = np.array([_x, _y, _z], np.float_)
     return ray
 
 
 def setDirection(ray, _dx, _dy, _dz):
-    ray[1] = np.array([_dx, _dy, _dz])
+    ray[1] = np.array([_dx, _dy, _dz], np.float_)
     return ray

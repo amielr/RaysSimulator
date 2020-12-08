@@ -46,10 +46,11 @@ def create_interpolated_mirror(mirrorCorrections):
 
     vertexDistanceX = (max(getXGrid(geneticallyAdjustedMirror))-min(getXGrid(geneticallyAdjustedMirror)))/(getXGrid(geneticallyAdjustedMirror).size-2)
     vertexDistanceY = (max(getYGrid(geneticallyAdjustedMirror))-min(getYGrid(geneticallyAdjustedMirror)))/(getYGrid(geneticallyAdjustedMirror).size-2)
+    print("marker")
     print(getZScalarField(geneticallyAdjustedMirror))
     interpolatedMirrorBuilder = interp2d(getMinBoundary(geneticallyAdjustedMirror), getMaxBoundary(geneticallyAdjustedMirror), [vertexDistanceX, vertexDistanceY], geneticallyAdjustedMirror.T, k=korder)
     # interpolatedMirrorBuilder = interpolate.interp2d(field.xGrid[0,:], field.yGrid[:,0], field.zScalarField, kind='cubic')
 
     mirrorBorders = np.concatenate(([getMinBoundary(geneticallyAdjustedMirror)], [getMaxBoundary(geneticallyAdjustedMirror)]),axis= None)
-    print("our mirror borders are: " + str(mirrorBorders))
+    # print("our mirror borders are: " + str(mirrorBorders))
     return mirrorBorders, interpolatedMirrorBuilder

@@ -4,30 +4,11 @@ from src.Simulator.FunctionSources import generate_light_source, create_interpol
 from src.Simulator.WignerFunction import wigner_transform
 from src.Simulator.RayPropogation import *
 from src.Simulator.PlotFunctions import *
+from numpy import linalg as LA
 import json
 
 with open('../config.json') as config_file:
     config = json.load(config_file)
-
-
-def error_value_calc(screenRays):
-    idealPoint = np.array([config["xScreenLocation"],
-                        config["yScreenLocation"],
-                        config["zScreenLocation"]])
-
-    meanDistance = 0
-    for ray in screenRays:
-        meanDistance += getAmplitude(ray) * (getOrigin(ray) - idealPoint).length()
-
-    meanDistance = meanDistance / len(screenRays)
-
-    variance = 0
-    for ray in screenRays:
-        variance += (getAmplitude(ray) * (getOrigin(ray) - idealPoint).length()) ** 2
-
-    variance = math.sqrt(variance) / len(screenRays)
-
-    return variance + meanDistance
 
 
 xVec, yVec, lightSource = generate_light_source()
@@ -37,8 +18,28 @@ plot_scatter(rays)
 
 rayList = np.array(rays)
 print("Our raylist size is: ", rayList.size)
-#plot_scatter(rayList)
+print("Our raylist length is: ", len(rayList))
+# plot_scatter(rayList)
 # x = 2
+
+def error_value_calc(screenRays):
+    idealPoint = np.array([config["xScreenLocation"],
+                        config["yScreenLocation"],
+                        config["zScreenLocation"]])
+
+    meanDistance = 0
+    for ray in screenRays:
+        meanDistance += getAmplitude(ray) * LA.norm(getOrigin(ray) - idealPoint)
+
+    meanDistance = meanDistance / len(screenRays)
+
+    variance = 0
+    for ray in screenRays:
+        variance += (getAmplitude(ray) * LA.norm(getOrigin(ray) - idealPoint)) ** 2
+
+    variance = math.sqrt(variance) / len(screenRays)
+
+    return variance + meanDistance
 
 
 def simulate_mirror(mirrorCorrections, plot):

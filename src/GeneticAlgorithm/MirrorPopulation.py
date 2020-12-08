@@ -28,16 +28,17 @@ def non_zero_random():
 
 
 def initiate_mirror_population():
+    global _population
     _population = [initiate_mirror_creature() for x in range(config["population_size"])]
     return _population
 
 
-
 def simulate_mirror_population(mirrors):
+    global _fitness
     for index, mirror in enumerate(mirrors):
         # print("Mirror #"+str(index))
         _fitness.append(simulate_mirror_creature_return_fitness(mirror))
-        print(str(index) + " : " + str(_fitness))
+        print("Mirror", str(index) + " Fitness : " + str(_fitness))
     return _fitness
 
 
@@ -53,6 +54,9 @@ def next_generation(mirrors, mirrorsFitness):
     return new_population
 
 def set_picked_probability_from_population(mirrorsPopulation):
+    global _bestPopulationProbability
+    global _population
+    global _best
     best_count = int(len(mirrorsPopulation) * config["best_percent"])
 
     mirrorsPopulation.sort(key=lambda m: simulate_mirror_creature_return_fitness(m), reverse=True)
@@ -89,47 +93,3 @@ def natural_select(mirrorsPopulation, bestPopulationProbability ):
         selected -= bestPopulationProbability(selected_index)
 
     return mirrorsPopulation[selected_index]
-
-
-
-# class MirrorPopulation:
-#
-#
-#
-#     def natural_select(self):
-#         selected = non_zero_random()
-#         selected_index = -1
-#         while selected > 0:
-#             selected_index += 1
-#             selected -= self._population[selected_index].get_picked_probability()
-#
-#         return self._population[selected_index]
-#
-#     def create_child(self):
-#         parent1 = self.natural_select()
-#         parent2 = self.natural_select()
-#
-#         dna = crossover(parent1.get_dna(), parent2.get_dna())
-#         child = initiate_mirror_creature(dna)
-#         child.mutate()
-#
-#         return child
-#
-#     def set_picked_probability(self):
-#         best_count = int(len(self._population) * config["best_percent"])
-#
-#         self._population.sort(key=lambda m: m.get_fitness(), reverse=True)
-#         best_population = self._population[0:best_count]
-#         all_best_population_score = [mirror.get_fitness() for mirror in best_population]
-#         all_best_population_probability = softmax(all_best_population_score)
-#
-#         [mirror.set_picked_probability(all_best_population_probability[index])
-#          for index, mirror in enumerate(best_population)]
-#
-#         self._population = best_population
-#         self._best = best_population[0]
-#
-#
-#
-#     def set_population(self, new_population):
-#         self._population = new_population

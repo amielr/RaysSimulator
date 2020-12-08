@@ -62,6 +62,7 @@ def getZScalarField(field):
 
 
 def set_mirror_borders(xGrid, yGrid):
+    global _xMin, _xMax, _yMin, _yMax
     _xMax = xGrid.max()
     _xMin = xGrid.min()
     _yMax = yGrid.max()

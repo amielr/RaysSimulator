@@ -39,9 +39,9 @@ def wigner_function(scalarArray, suitedCoordinate, space, frequencies):
 
     for wignerRow in range(len(wignerDist)):
         for wignerColumn in range(len(wignerDist[wignerRow])):
-            origin = np.array([space[wignerColumn], suitedCoordinate, 0])
-            direction = np.array([frequencies[wignerRow], 0, 1])
-            amplitude = wignerDist[wignerRow][wignerColumn]
+            origin = np.array([space[wignerColumn], suitedCoordinate, 0], dtype=np.float_)
+            direction = np.array([frequencies[wignerRow], 0, 1], dtype=np.float_)
+            amplitude = np.array([wignerDist[wignerRow][wignerColumn], 0, 0])
             ray = np.array([origin, direction, amplitude])
             rayList.append(ray)
 
@@ -76,9 +76,9 @@ def wigner_transform(lightSource, xVec, yVec):
     for counter in range(len(columnsWignerTransform)):
         ray = columnsWignerTransform[counter]
 
-        orig = np.array([getY(getOrigin(ray)), getX(getOrigin(ray)), getZ(getOrigin(ray))])
-        dire = np.array([getY(getDirection(ray)), getX(getDirection(ray)), getZ(getDirection(ray))])
-        amp = getAmplitude(ray)
+        orig = np.array([getY(getOrigin(ray)), getX(getOrigin(ray)), getZ(getOrigin(ray))], np.float_)
+        dire = np.array([getY(getDirection(ray)), getX(getDirection(ray)), getZ(getDirection(ray))], np.float_)
+        amp = np.array([getAmplitude(ray), 0, 0], np.float_)
 
         updatedColumnsWignerTransform.append([orig, dire, amp])
 
