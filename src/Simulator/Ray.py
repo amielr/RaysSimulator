@@ -3,9 +3,9 @@ import numpy as np
 from numba import njit
 
 number_of_rays = 0
-origin = np.array([0, 0, 0], dtype=float)
-direction = np.array([0, 0, 0], dtype=float)
-amplitude = 0
+origin = np.array([0, 0, 0], dtype=np.float_)
+direction = np.array([0, 0, 0], dtype=np.float_)
+amplitude = np.array([0, 0, 0], dtype=np.float_)
 
 # def __init__(self, _origin=Vector(0, 0, 0), _direction=Vector(0, 0, 0), _amplidute=0):
 #     self.origin = _origin
@@ -18,7 +18,7 @@ amplitude = 0
 
 
 def setAmplitude(ray, _amplitude):
-    ray[2] = _amplitude
+    ray[2][0] = _amplitude
     return ray
 
 
@@ -31,13 +31,13 @@ def getNumberOfRays(self):
     return self.number_of_rays
 
 
-# @njit(parallel=True)
-def getOrigin(ray):
+# @njit()
+def getOrigin(ray) -> np.array(3, dtype=np.float_):
     return ray[0]
 
 
-# @njit(parallel=True)
-def getDirection(ray):
+# @njit()
+def getDirection(ray) -> np.array(3 ,dtype=np.float_):
     return ray[1]
 
 
