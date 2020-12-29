@@ -3,7 +3,7 @@ import numpy as np
 from src.GeneticAlgorithm.MirrorCreature import *
 import json
 
-with open('../config.json') as config_file:
+with open('./config.json') as config_file:
     config = json.load(config_file)
 
 _population = []
@@ -64,7 +64,7 @@ def set_picked_probability_from_population(mirrorsPopulation):
     all_best_population_score = [simulate_mirror_creature_return_fitness(mirror) for mirror in best_population]
     all_best_population_probability = softmax(all_best_population_score)   #I dont understand what purpose this serves
 
-    [mirror.set_picked_probability_of_mirror(all_best_population_probability[index])
+    [set_picked_probability_of_mirror(all_best_population_probability[index])
      for index, mirror in enumerate(best_population)]   #need to think about this how to create matching index
 
     _bestPopulationProbability = all_best_population_probability  #maybe this is the way
@@ -90,6 +90,10 @@ def natural_select(mirrorsPopulation, bestPopulationProbability ):
     selected_index = -1
     while selected > 0:
         selected_index += 1
-        selected -= bestPopulationProbability(selected_index)
+        selected -= bestPopulationProbability[selected_index]
 
     return mirrorsPopulation[selected_index]
+
+# def set_population(new_population):
+#     global _population = new_population
+#     return

@@ -7,14 +7,14 @@ from src.Simulator.PlotFunctions import *
 from numpy import linalg as LA
 import json
 
-with open('../config.json') as config_file:
+with open('./config.json') as config_file:
     config = json.load(config_file)
 
 
 xVec, yVec, lightSource = generate_light_source()
 rays = wigner_transform(lightSource, xVec, yVec)
 
-plot_scatter(rays)
+#plot_scatter(rays)
 
 rayList = np.array(rays)
 print("Our raylist size is: ", rayList.size)

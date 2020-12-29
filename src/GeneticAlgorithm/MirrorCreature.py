@@ -4,7 +4,7 @@ import numpy as np
 
 from src.Simulator.RaysSimulator import simulate_mirror
 
-with open('../config.json') as config_file:
+with open('./config.json') as config_file:
     config = json.load(config_file)
 
 mirrorGridDensity = config["mirrorGridDensity"]
@@ -45,12 +45,15 @@ def mutate(dna):
             dna = change_gene(dna, index)
     return dna
 
+
 def get_picked_probability():
     return _picked_probability
+
 
 def set_picked_probability_of_mirror(probability):
     global _picked_probability
     _picked_probability = probability
+
 
 def calculate_fitness(error):
     return -error

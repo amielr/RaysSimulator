@@ -1,5 +1,5 @@
 import numpy as np
-import numba
+from numba import njit, prange
 
 ################################################################################
 # 1D Extrapolation Routines
@@ -141,10 +141,10 @@ class interp1d(object):
             return _out[0]
 
 # interpolation routines
-@numba.njit(parallel=True)
+@njit(parallel=True)
 def _interp1d_k1(f, xout, fout, a, h, n, p, o, lb, ub):
     m = fout.shape[0]
-    for mi in numba.prange(m):
+    for mi in prange(m):
         xr = min(max(xout[mi], lb), ub)
         xx = xr - a
         ix = int(xx//h)
@@ -157,7 +157,7 @@ def _interp1d_k1(f, xout, fout, a, h, n, p, o, lb, ub):
         for i in range(2):
             ixi = (ix + i) % n if p else ix + i
             fout[mi] += f[ixi]*asx[i]
-@numba.njit(parallel=True)
+@njit(parallel=True)
 def _interp1d_k3(f, xout, fout, a, h, n, p, o, lb, ub):
     m = fout.shape[0]
     for mi in numba.prange(m):
@@ -175,10 +175,10 @@ def _interp1d_k3(f, xout, fout, a, h, n, p, o, lb, ub):
         for i in range(4):
             ixi = (ix + i) % n if p else ix + i
             fout[mi] += f[ixi]*asx[i]
-@numba.njit(parallel=True)
+@njit(parallel=True)
 def _interp1d_k5(f, xout, fout, a, h, n, p, o, lb, ub):
     m = fout.shape[0]
-    for mi in numba.prange(m):
+    for mi in prange(m):
         xr = min(max(xout[mi], lb), ub)
         xx = xr - a
         ix = int(xx//h)
@@ -195,10 +195,10 @@ def _interp1d_k5(f, xout, fout, a, h, n, p, o, lb, ub):
         for i in range(6):
             ixi = (ix + i) % n if p else ix + i
             fout[mi] += f[ixi]*asx[i]
-@numba.njit(parallel=True)
+@njit(parallel=True)
 def _interp1d_k7(f, xout, fout, a, h, n, p, o, lb, ub):
     m = fout.shape[0]
-    for mi in numba.prange(m):
+    for mi in prange(m):
         xr = min(max(xout[mi], lb), ub)
         xx = xr - a
         ix = int(xx//h)
@@ -217,10 +217,10 @@ def _interp1d_k7(f, xout, fout, a, h, n, p, o, lb, ub):
         for i in range(8):
             ixi = (ix + i) % n if p else ix + i
             fout[mi] += f[ixi]*asx[i]
-@numba.njit(parallel=True)
+@njit(parallel=True)
 def _interp1d_k9(f, xout, fout, a, h, n, p, o, lb, ub):
     m = fout.shape[0]
-    for mi in numba.prange(m):
+    for mi in prange(m):
         xr = min(max(xout[mi], lb), ub)
         xx = xr - a
         ix = int(xx//h)
@@ -325,10 +325,10 @@ class interp2d(object):
             return _out[0]
 
 # interpolation routines
-@numba.njit(parallel=True)
+@njit(parallel=True)
 def _interp2d_k1(f, xout, yout, fout, a, h, n, p, o, lb, ub):
     m = fout.shape[0]
-    for mi in numba.prange(m):
+    for mi in prange(m):
         xr = min(max(xout[mi], lb[0]), ub[0])
         yr = min(max(yout[mi], lb[1]), ub[1])
         xx = xr - a[0]
@@ -351,10 +351,10 @@ def _interp2d_k1(f, xout, yout, fout, a, h, n, p, o, lb, ub):
             for j in range(2):
                 iyj = (iy + j) % n[1] if p[1] else iy + j
                 fout[mi] += f[ixi,iyj]*asx[i]*asy[j]
-@numba.njit(parallel=True)
+@njit(parallel=True)
 def _interp2d_k3(f, xout, yout, fout, a, h, n, p, o, lb, ub):
     m = fout.shape[0]
-    for mi in numba.prange(m):
+    for mi in prange(m):
         xr = min(max(xout[mi], lb[0]), ub[0])
         yr = min(max(yout[mi], lb[1]), ub[1])
         xx = xr - a[0]
@@ -381,10 +381,10 @@ def _interp2d_k3(f, xout, yout, fout, a, h, n, p, o, lb, ub):
             for j in range(4):
                 iyj = (iy + j) % n[1] if p[1] else iy + j
                 fout[mi] += f[ixi,iyj]*asx[i]*asy[j]
-# @numba.njit(parallel=True)
+@njit(parallel=True)
 def _interp2d_k5(f, xout, yout, fout, a, h, n, p, o, lb, ub):
     m = fout.shape[0]
-    for mi in numba.prange(m):
+    for mi in prange(m):
         xr = min(max(xout[mi], lb[0]), ub[0])
         yr = min(max(yout[mi], lb[1]), ub[1])
         xx = xr - a[0]
@@ -415,10 +415,10 @@ def _interp2d_k5(f, xout, yout, fout, a, h, n, p, o, lb, ub):
             for j in range(6):
                 iyj = (iy + j) % n[1] if p[1] else iy + j
                 fout[mi] += f[ixi,iyj]*asx[i]*asy[j]
-# @numba.njit(parallel=True)
+# @njit(parallel=True)
 def _interp2d_k7(f, xout, yout, fout, a, h, n, p, o, lb, ub):
     m = fout.shape[0]
-    for mi in numba.prange(m):
+    for mi in prange(m):
         xr = min(max(xout[mi], lb[0]), ub[0])
         yr = min(max(yout[mi], lb[1]), ub[1])
         xx = xr - a[0]
@@ -453,10 +453,10 @@ def _interp2d_k7(f, xout, yout, fout, a, h, n, p, o, lb, ub):
             for j in range(8):
                 iyj = (iy + j) % n[1] if p[1] else iy + j
                 fout[mi] += f[ixi,iyj]*asx[i]*asy[j]
-@numba.njit(parallel=True)
+@njit(parallel=True)
 def _interp2d_k9(f, xout, yout, fout, a, h, n, p, o, lb, ub):
     m = fout.shape[0]
-    for mi in numba.prange(m):
+    for mi in prange(m):
         xr = min(max(xout[mi], lb[0]), ub[0])
         yr = min(max(yout[mi], lb[1]), ub[1])
         xx = xr - a[0]
@@ -522,11 +522,11 @@ def _fill2(f, fb, ox, oy):
         fb[ox:ox+nx, oy:oy+ny] = f
     else:
         __fill2(f, fb, ox, oy)
-@numba.njit(parallel=True)
+@njit(parallel=True)
 def __fill2(f, fb, ox, oy):
     nx = f.shape[0]
     ny = f.shape[1]
-    for i in numba.prange(nx):
+    for i in prange(nx):
         for j in range(ny):
             fb[i+ox,j+oy] = f[i,j]
 def _compute_bounds(a, b, h, p, c, e, k):
@@ -593,10 +593,10 @@ class interp3d(object):
             return _out[0]
 
 # interpolation routines
-@numba.njit(parallel=True)
+@njit(parallel=True)
 def _interp3d_k1(f, xout, yout, zout, fout, a, h, n, p, o, lb, ub):
     m = fout.shape[0]
-    for mi in numba.prange(m):
+    for mi in prange(m):
         xr = min(max(xout[mi], lb[0]), ub[0])
         yr = min(max(yout[mi], lb[1]), ub[1])
         zr = min(max(zout[mi], lb[2]), ub[2])
@@ -629,10 +629,10 @@ def _interp3d_k1(f, xout, yout, zout, fout, a, h, n, p, o, lb, ub):
                 for k in range(2):
                     izk = (iz + k) % n[2] if p[2] else iz + k
                     fout[mi] += f[ixi,iyj,izk]*asx[i]*asy[j]*asz[k]
-@numba.njit(parallel=True)
+@njit(parallel=True)
 def _interp3d_k3(f, xout, yout, zout, fout, a, h, n, p, o, lb, ub):
     m = fout.shape[0]
-    for mi in numba.prange(m):
+    for mi in prange(m):
         xr = min(max(xout[mi], lb[0]), ub[0])
         yr = min(max(yout[mi], lb[1]), ub[1])
         zr = min(max(zout[mi], lb[2]), ub[2])
@@ -671,10 +671,10 @@ def _interp3d_k3(f, xout, yout, zout, fout, a, h, n, p, o, lb, ub):
                 for k in range(4):
                     izk = (iz + k) % n[2] if p[2] else iz + k
                     fout[mi] += f[ixi,iyj,izk]*asx[i]*asy[j]*asz[k]
-@numba.njit(parallel=True)
+@njit(parallel=True)
 def _interp3d_k5(f, xout, yout, zout, fout, a, h, n, p, o, lb, ub):
     m = fout.shape[0]
-    for mi in numba.prange(m):
+    for mi in prange(m):
         xr = min(max(xout[mi], lb[0]), ub[0])
         yr = min(max(yout[mi], lb[1]), ub[1])
         zr = min(max(zout[mi], lb[2]), ub[2])
@@ -719,10 +719,10 @@ def _interp3d_k5(f, xout, yout, zout, fout, a, h, n, p, o, lb, ub):
                 for k in range(6):
                     izk = (iz + k) % n[2] if p[2] else iz + k
                     fout[mi] += f[ixi,iyj,izk]*asx[i]*asy[j]*asz[k]
-@numba.njit(parallel=True)
+@njit(parallel=True)
 def _interp3d_k7(f, xout, yout, zout, fout, a, h, n, p, o, lb, ub):
     m = fout.shape[0]
-    for mi in numba.prange(m):
+    for mi in prange(m):
         xr = min(max(xout[mi], lb[0]), ub[0])
         yr = min(max(yout[mi], lb[1]), ub[1])
         zr = min(max(zout[mi], lb[2]), ub[2])
@@ -773,10 +773,10 @@ def _interp3d_k7(f, xout, yout, zout, fout, a, h, n, p, o, lb, ub):
                 for k in range(8):
                     izk = (iz + k) % n[2] if p[2] else iz + k
                     fout[mi] += f[ixi,iyj,izk]*asx[i]*asy[j]*asz[k]
-@numba.njit(parallel=True)
+@njit(parallel=True)
 def _interp3d_k9(f, xout, yout, zout, fout, a, h, n, p, o, lb, ub):
     m = fout.shape[0]
-    for mi in numba.prange(m):
+    for mi in prange(m):
         xr = min(max(xout[mi], lb[0]), ub[0])
         yr = min(max(yout[mi], lb[1]), ub[1])
         zr = min(max(zout[mi], lb[2]), ub[2])
@@ -865,12 +865,12 @@ def _fill3(f, fb, ox, oy, oz):
         fb[ox:ox+nx, oy:oy+ny, oz:oz+nz] = f
     else:
         __fill3(f, fb, ox, oy, oz)
-@numba.njit(parallel=True)
+@njit(parallel=True)
 def __fill3(f, fb, ox, oy, oz):
     nx = f.shape[0]
     ny = f.shape[1]
     nz = f.shape[2]
-    for i in numba.prange(nx):
+    for i in prange(nx):
         for j in range(ny):
             for k in range(nz):
                 fb[i+ox,j+oy,k+oz] = f[i,j,k]

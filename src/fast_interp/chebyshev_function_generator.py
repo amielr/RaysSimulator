@@ -20,7 +20,7 @@ def get_chebyshev_nodes(lb, ub, order):
 ################################################################################
 # numba functions
 
-@numba.njit(fastmath=True)
+@njit(fastmath=True)
 def bisect_search(x, ordered_array):
     n1 = 0
     n2 = ordered_array.size
@@ -34,7 +34,7 @@ def bisect_search(x, ordered_array):
         d = n2 - n1
     return n1
 
-@numba.njit(fastmath=True)
+@njit(fastmath=True)
 def _numba_chbevl(x, c):
     x2 = 2*x
     c0 = c[-2]
@@ -45,13 +45,13 @@ def _numba_chbevl(x, c):
         c1 = tmp + c1*x2
     return c0 + c1*x
 
-@numba.njit(parallel=True, fastmath=True)
+@njit(parallel=True, fastmath=True)
 def _numba_multieval_check(xs, lbs, ubs, iscale, cs, out):
     n = xs.size
     for i in numba.prange(n):
         out[i] = _numba_eval_check(xs[i], lbs, ubs, iscale, cs)
 
-@numba.njit(parallel=True, fastmath=True)
+@njit(parallel=True, fastmath=True)
 def _numba_multieval(xs, lbs, ubs, iscale, cs, out):
     n = xs.size
     for i in numba.prange(n):
@@ -64,14 +64,14 @@ def _numba_multieval(xs, lbs, ubs, iscale, cs, out):
         c = cs[ind]
         out[i] = _numba_chbevl(_x, c)
 
-@numba.njit(fastmath=True)
+@njit(fastmath=True)
 def _numba_eval_check(x, lbs, ubs, iscale, cs):
     if x >= lbs[0] and x <= ubs[-1]:
         return _numba_eval(x, lbs, ubs, iscale, cs)
     else:
         return np.nan
 
-@numba.njit(fastmath=True)
+@njit(fastmath=True)
 def _numba_eval(x, lbs, ubs, iscale, cs):
     ind = bisect_search(x, lbs)
     a = lbs[ind]
@@ -152,7 +152,7 @@ class ChebyshevFunctionGenerator(object):
         lbs = self.lbs
         ubs = self.ubs
         cs = self.coef_mat
-        @numba.njit(fastmath=True)
+        @njit(fastmath=True)
         def func(x):
             if x > lbs[0] and x < ubs[-1]:
                 ind = _get_ind(x, ubs)
@@ -213,7 +213,7 @@ class Leaf(object):
 
 leaf_type.define(Leaf.class_type.instance_type)
 
-@numba.njit
+@njit
 def get_ind(tree, x):
     leaf = tree
     while leaf.get_parent():

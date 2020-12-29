@@ -3,10 +3,22 @@ import json
 
 from src.GeneticAlgorithm.MirrorCreature import *
 from src.GeneticAlgorithm.MirrorPopulation import *
+import platform
+import struct
 
+def is_os_64bit():
+    return platform.machine().endswith('64')
+
+
+def is_python_64bit():
+    return (struct.calcsize("P") == 8)
 
 def startSimulation():
-    with open('../config.json') as config_file:
+
+    is_os_64bit()
+    is_python_64bit()
+
+    with open('./config.json') as config_file:
         config = json.load(config_file)
 
     mirrorGridDensity = config["mirrorGridDensity"]
@@ -22,12 +34,13 @@ def startSimulation():
     while True:
         mirrorsfitnesses = simulate_mirror_population(mirrors)
         new_population = next_generation(mirrors, mirrorsfitnesses)
-        mirrors.set_population(new_population)
-
+        # mirrors.set_population(new_population)
+        mirrors = new_population
         print("Generation number: " + str(index))
-        print(mirrors.get_best().get_fitness())
+        # print(mirrors.get_best().get_fitness())
         # if (index % 10) == 0:
-        mirrors.get_best().simulate(plot=True)
+        #simulate_mirror_population(mirrors, plot=True)
+        #mirrors.get_best().simulate(plot=True)
         print()
         index += 1
 

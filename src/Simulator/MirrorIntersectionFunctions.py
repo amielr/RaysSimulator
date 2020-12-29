@@ -28,7 +28,9 @@ def is_ray_in_mirror_bounds(mirrorHitPoint, mirrorBorders):
 
 def get_ray_mirror_intersection_point(wantedError, mirror_interp, ray):
     checkpointLocation = getOrigin(ray)
-    currentZ = mirror_interp(getX(checkpointLocation), getY(checkpointLocation))
+    xLocation = getX(checkpointLocation)
+    yLocation = getY(checkpointLocation)
+    currentZ = mirror_interp(xLocation, yLocation)
     error = currentZ - getZ(checkpointLocation)
 
     while abs(error) > wantedError:
@@ -51,8 +53,8 @@ def generate_plane_normal(mirrorHitPoint, mirrorInterpolator):
     dx = 0.2
     dy = 0.2
 
-    x = mirrorHitPoint.getX()
-    y = mirrorHitPoint.getY()
+    x = getX(mirrorHitPoint)
+    y = getY(mirrorHitPoint)
 
     p1x = x  # create triangulation points
     p1y = y + dy * np.sqrt(2)  # In order to be able to calculate reflection normal
@@ -76,7 +78,8 @@ def generate_plane_normal(mirrorHitPoint, mirrorInterpolator):
 
 
 def get_reflected_direction(direction, planeNormal):
-    ndot = direction.dot_product(planeNormal)
+    # ndot = direction.dot_product(planeNormal)
+    ndot = np.dot(direction, planeNormal)
     reflectedRayDirection = direction - planeNormal * (2 * ndot)
 
     return reflectedRayDirection

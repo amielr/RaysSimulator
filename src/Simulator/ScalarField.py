@@ -69,17 +69,18 @@ def set_mirror_borders(xGrid, yGrid):
     _yMin = yGrid.min()
     return [_xMax, _xMin, _yMax, _yMin]
 
-def getMinBoundary(field):
-    set_mirror_borders(field[0], field[1])
+def getMinBoundary():
+    #set_mirror_borders(field[0], field[1])
     return np.array([_xMin, _yMin])
 
-def getMaxBoundary(field):
-    set_mirror_borders(field[0], field[1])
+def getMaxBoundary():
+    #set_mirror_borders(field[0], field[1])
     return np.array([_xMax, _yMax])
 
 def add_offset(field, offset):
     #print(field)
-    adjustedField = field[2] + offset
+    adjustedField = field
+    adjustedField[2] = adjustedField[2] + offset
     return adjustedField
 
 @property

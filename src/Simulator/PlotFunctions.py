@@ -12,7 +12,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 
 
-with open('../config.json') as config_file:
+with open('./config.json') as config_file:
     config = json.load(config_file)
 
 matplotlib.use('TkAgg')
