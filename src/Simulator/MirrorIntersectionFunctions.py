@@ -70,16 +70,17 @@ def generate_plane_normal(mirrorHitPoint, mirrorInterpolator):
     p1 = np.array([p1x, p1y, p1z])
     p2 = np.array([p2x, p2y, p2z])
     p3 = np.array([p3x, p3y, p3z])
-    v1 = p3 - p1
-    v2 = p2 - p1
+    v1 = p2 - p1
+    v2 = p3 - p1
     cp = np.cross(v1, v2)
-    cp = cp * (1 / cp.size)
-    return cp
+    normalizedcp = cp /np.linalg.norm(cp)
+
+    return normalizedcp
 
 
 def get_reflected_direction(direction, planeNormal):
     # ndot = direction.dot_product(planeNormal)
     ndot = np.dot(direction, planeNormal)
-    reflectedRayDirection = direction - planeNormal * (2 * ndot)
+    reflectedRayDirection = direction - (2 * ndot) * planeNormal
 
     return reflectedRayDirection

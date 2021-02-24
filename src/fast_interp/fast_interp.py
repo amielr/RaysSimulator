@@ -160,7 +160,7 @@ def _interp1d_k1(f, xout, fout, a, h, n, p, o, lb, ub):
 @njit(parallel=True)
 def _interp1d_k3(f, xout, fout, a, h, n, p, o, lb, ub):
     m = fout.shape[0]
-    for mi in numba.prange(m):
+    for mi in prange(m):
         xr = min(max(xout[mi], lb), ub)
         xx = xr - a
         ix = int(xx//h)

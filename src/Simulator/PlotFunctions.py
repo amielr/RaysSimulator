@@ -58,26 +58,36 @@ def plot_scatter(rays):
 
     raysY = []
     raysX = []
+    raysZ = []
     for ray in rays:
         raysY.append(getY(getOrigin(ray)))
         raysX.append(getX(getOrigin(ray)))
+        raysZ.append(getZ(getOrigin(ray)))
 
     padding = 5
 
-    plt.figure(2)
-    plt.clf()
-    plt.axis([min(raysY) - padding, max(raysY) + padding, min(raysX) - padding, max(raysX) + padding])
-    plt.scatter(raysY, raysX, c='r', marker='o', s=[getAmplitude(ray) for ray in rays])
+    #fig = plt.figure()
+
+    fig = plt.figure(2)
+    ax = fig.add_subplot(111, projection='3d')
+
+    #ax.clf()
+    ax.axis([min(raysY) - padding, max(raysY) + padding, min(raysX) - padding, max(raysX) + padding])
+    ax.scatter(raysY, raysX, raysZ, c='r', marker='o', s=[getAmplitude(ray) for ray in rays])
     plt.show(block=False)
-    #plt.pause(1)
+    plt.pause(1)
 
 def plot_heatmap(rays):
-    raysY = np.array([ray.getOrigin().getY() for ray in rays])
-    raysZ = np.array([ray.getOrigin().getZ() for ray in rays])
+    #raysY = np.array([ray.getOrigin().getY() for ray in rays])
+    raysY = np.array([getY(getOrigin(ray)) for ray in rays])
+
+    #raysZ = np.array([ray.getOrigin().getZ() for ray in rays])
+    raysZ = np.array([getZ(getOrigin(ray)) for ray in rays])
+
 
     padding = 5
 
-    heatmap, xedges, yedges = np.histogram2d(raysY, raysZ, bins=50, weights=[ray.getAmplitude() for ray in rays])
+    heatmap, xedges, yedges = np.histogram2d(raysY, raysZ, bins=50, weights=[getAmplitude(ray) for ray in rays])
     extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
 
     plt.figure(2)

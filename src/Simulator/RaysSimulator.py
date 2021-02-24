@@ -19,8 +19,8 @@ rays = wigner_transform(lightSource, xVec, yVec)
 rayList = np.array(rays)
 print("Our raylist size is: ", rayList.size)
 print("Our raylist length is: ", len(rayList))
-# plot_scatter(rayList)
-# x = 2
+#plot_scatter(rayList)
+#x = 2
 
 def error_value_calc(screenRays):
     idealPoint = np.array([config["xScreenLocation"],

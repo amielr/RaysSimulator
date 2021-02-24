@@ -3,6 +3,7 @@ from numpy import genfromtxt
 import json
 from ..fast_interp import interp2d, interp3d
 from src.Simulator.ScalarField import *
+from numba.typed import List
 
 with open('./config.json') as config_file:
     config = json.load(config_file)
@@ -48,7 +49,10 @@ def create_interpolated_mirror(mirrorCorrections):
     # print("marker")
     # print(getZScalarField(geneticallyAdjustedMirror))
     set_mirror_borders(geneticallyAdjustedMirror[0], geneticallyAdjustedMirror[1])
-    interpolatedMirrorBuilder = interp2d(getMinBoundary(), getMaxBoundary(), [vertexDistanceX, vertexDistanceY], geneticallyAdjustedMirror[2].T, k=korder)
+
+    vertexDetails = np.array([vertexDistanceX, vertexDistanceY])
+    #vertexDetails.append(vertexDistanceX, vertexDistanceY)
+    interpolatedMirrorBuilder = interp2d(getMinBoundary(), getMaxBoundary(), vertexDetails, geneticallyAdjustedMirror[2].T, k=korder)
     # interpolatedMirrorBuilder = interpolate.interp2d(field.xGrid[0,:], field.yGrid[:,0], field.zScalarField, kind='cubic')
 
     mirrorBorders = np.concatenate(([getMinBoundary()], [getMaxBoundary()]),axis= None)

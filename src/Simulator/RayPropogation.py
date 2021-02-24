@@ -4,7 +4,9 @@ from numba import njit, jit, prange, vectorize
 from numba.typed import List
 
 
+
 from src.Simulator.MirrorIntersectionFunctions import *
+from src.Simulator.PlotFunctions import *
 from src.Simulator.Ray import *
 
 with open('./config.json') as config_file:
@@ -29,8 +31,8 @@ def line_plane_collision(planeNormal, ray, epsilon=1e-6):
 
 # @njit(parallel=True)
 def build_intersections_with_mirror(rayList, mirrorInterpolator, mirrorBorders, errorValue):
-    reflectedRayList = List()
-
+    #reflectedRayList = List()
+    reflectedRayList = []
     #for x in range(len(rayList)):
     #    reflectedRayList.append(np.array([[origin], [direction], [amplitude]]))  #this could cause and error
         # reflectedRayListnp
@@ -38,7 +40,7 @@ def build_intersections_with_mirror(rayList, mirrorInterpolator, mirrorBorders, 
     # print(len(rayList))
     # print(len(rayList[0]))
     for rayIndex in range(len(rayList)):
-        ray = rayList[rayIndex-1]
+        ray = rayList[rayIndex]
         mirrorHitPoint = get_ray_mirror_intersection_point(errorValue, mirrorInterpolator, ray)
 
         if is_ray_in_mirror_bounds(mirrorHitPoint, mirrorBorders):
@@ -48,18 +50,12 @@ def build_intersections_with_mirror(rayList, mirrorInterpolator, mirrorBorders, 
             reflectedRayList.append(reflectedRay)
             # reflectedRayList[rayIndex] = reflectedRay
     # reflectedRayListnp = np.array(reflectedRayList)
+    # plot_scatter(reflectedRayList)
 
     print("end mirror intersection")
     print(len(reflectedRayList))
-    nonZeroReflectedRays = List() #np.empty((3, 3), dtype=np.float_)
-    for rayIndex in range(len(reflectedRayList)):
-        ray = rayList[rayIndex]
-        #print(getAmplitude(ray))
-        if getAmplitude(ray) > 0:
-            nonZeroReflectedRays.append(ray)
-    print("our nonzeroreflectedrays: ", len(nonZeroReflectedRays))
-    #nonZeroReflectedRaysnp = np.array(nonZeroReflectedRays,dtype=np.float_)
-    return nonZeroReflectedRays
+
+    return reflectedRayList
 
 
 # @vectorize(['Ray(Ray)'], target='cuda')
