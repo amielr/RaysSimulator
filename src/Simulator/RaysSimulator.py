@@ -2,6 +2,7 @@ import math
 
 from src.Simulator.FunctionSources import generate_light_source, create_interpolated_mirror
 from src.Simulator.WignerFunction import wigner_transform
+from src.Simulator.Wigner2DElement import *
 from src.Simulator.RayPropogation import *
 from src.Simulator.PlotFunctions import *
 from numpy import linalg as LA
@@ -12,7 +13,16 @@ with open('./config.json') as config_file:
 
 
 xVec, yVec, lightSource = generate_light_source()
-rays = wigner_transform(lightSource, xVec, yVec)
+
+option = 'Amiel'
+
+if option == 'Amiel':
+    rays = wigner_transform(lightSource, xVec, yVec)
+else:
+    rays = michaelMain()
+
+
+
 
 #plot_scatter(rays)
 
