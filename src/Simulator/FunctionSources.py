@@ -1,6 +1,7 @@
 import numpy as np
 from numpy import genfromtxt
 import json
+from scipy import interpolate
 from ..fast_interp import interp2d, interp3d
 from src.Simulator.ScalarField import *
 from numba.typed import List
@@ -44,16 +45,21 @@ def create_interpolated_mirror(mirrorCorrections):
     OffsetMirror = add_offset(RotatedMirror, mirrorOffsetFromSource)
     geneticallyAdjustedMirror = add_offset(OffsetMirror, mirrorCorrections)
 
-    vertexDistanceX = (max(getXGrid(geneticallyAdjustedMirror[0]))-min(getXGrid(geneticallyAdjustedMirror[0])))/(getXGrid(geneticallyAdjustedMirror[0]).size-2)
-    vertexDistanceY = (max(getYGrid(geneticallyAdjustedMirror[1].T))-min(getYGrid(geneticallyAdjustedMirror[1].T)))/(getYGrid(geneticallyAdjustedMirror[1]).size-2)
+    # vertexDistanceX = (max(getXGrid(geneticallyAdjustedMirror[0]))-min(getXGrid(geneticallyAdjustedMirror[0])))/(getXGrid(geneticallyAdjustedMirror[0]).size-2)
+    # vertexDistanceY = (max(getYGrid(geneticallyAdjustedMirror[1].T))-min(getYGrid(geneticallyAdjustedMirror[1].T)))/(getYGrid(geneticallyAdjustedMirror[1]).size-2)
     # print("marker")
     # print(getZScalarField(geneticallyAdjustedMirror))
     set_mirror_borders(geneticallyAdjustedMirror[0], geneticallyAdjustedMirror[1])
 
-    vertexDetails = np.array([vertexDistanceX, vertexDistanceY])
+    # vertexDetails = np.array([vertexDistanceX, vertexDistanceY])
     #vertexDetails.append(vertexDistanceX, vertexDistanceY)
-    interpolatedMirrorBuilder = interp2d(getMinBoundary(), getMaxBoundary(), vertexDetails, geneticallyAdjustedMirror[2].T, k=korder)
-    # interpolatedMirrorBuilder = interpolate.interp2d(field.xGrid[0,:], field.yGrid[:,0], field.zScalarField, kind='cubic')
+    #interpolatedMirrorBuilder = interp2d(getMinBoundary(), getMaxBoundary(), vertexDetails, geneticallyAdjustedMirror[2].T, k=korder)
+    #interpolatedMirrorBuilder = interpolate.interp2d(field.xGrid[0,:], field.yGrid[:,0], field.zScalarField, kind='cubic')
+    # geneticallyAdjustedMirror
+
+    interpolatedMirrorBuilder = interpolate.interp2d(axis, axis, getZScalarField(geneticallyAdjustedMirror), kind='cubic')
+
+
 
     mirrorBorders = np.concatenate(([getMinBoundary()], [getMaxBoundary()]),axis= None)
     # print("our mirror borders are: " + str(mirrorBorders))

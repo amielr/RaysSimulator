@@ -26,7 +26,7 @@ class MirrorPopulation:
     _best = MirrorCreature()
 
     def __init__(self):
-        self._population = [MirrorCreature() for x in range(config["population_size"])]
+        self._population = [MirrorCreature() for xrefle in range(config["population_size"])]
 
     def simulate(self, generationNum):
         for index, mirror in enumerate(self._population):

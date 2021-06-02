@@ -96,6 +96,7 @@ def build_intersections_with_screen(rayList, screenNormal):
 def ray_propogation(rayList, mirrorInterpolator, mirrorBorders):
     reflectedRayList = build_intersections_with_mirror(rayList, mirrorInterpolator, mirrorBorders,
                                                        config["mirrorErrorValue"])
+    #plot_scatter(reflectedRayList)
 
     reflectedRayListnp = np.array(reflectedRayList, dtype=np.float_)
 

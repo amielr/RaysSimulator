@@ -52,3 +52,4 @@ class MirrorCreature:
         mirrorGrid = np.array(self._dna).reshape((mirrorGridDensity, mirrorGridDensity))
         error = simulate_mirror(mirrorGrid, plot)
         self.calculate_fitness(error)
+        return error

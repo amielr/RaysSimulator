@@ -2,6 +2,7 @@ import numpy as np
 from scipy.linalg import circulant
 from scipy.fftpack import fft
 
+from Simulator.PlotFunctions import plot_scatter
 from src.Simulator.Ray import *
 from src.Simulator.Vector import *
 from numba.typed import List
@@ -36,7 +37,7 @@ def wigner_function(scalarArray, suitedCoordinate, space, frequencies):
     corrMatrix = prep_corr_matrix_from_vector(scalarArray)
     wignerDist = fourier_each_vector(corrMatrix)
 
-    rayList = List()
+    rayList = []
 
     for wignerRow in range(len(wignerDist)):
         for wignerColumn in range(len(wignerDist[wignerRow])):
@@ -58,14 +59,14 @@ def apply_wigner_along_axis(scalarField, axis):
 
     axisFrequencies = get_fourier_frequencies(axisUpSample)
 
-    rayList = List()
+    rayList = []
 
     for index in range(len(scalarField)):
         array = scalarField[index]
         rays = wigner_function(array, axisUpSample[index] * 2 - axisUpSample[0], axisUpSample, axisFrequencies)
         rayList.append(rays)
 
-    reArrangedRayList = List()
+    reArrangedRayList = []
     for sublist in rayList:
         for item in sublist:
             reArrangedRayList.append(item)
@@ -73,21 +74,24 @@ def apply_wigner_along_axis(scalarField, axis):
     return reArrangedRayList  # [item for sublist in rayList for item in sublist]
 
 
+
+
+
+
+
+
 def wigner_transform(lightSource, xVec, yVec):
-    updatedColumnsWignerTransform = List()
-    allRaysFromWigner = List()
+    updatedColumnsWignerTransform = []
+    allRaysFromWigner = []
 
     rowsWignerTransform = apply_wigner_along_axis(lightSource, xVec)
     columnsWignerTransform = apply_wigner_along_axis(lightSource.T, yVec)
 
-
-
-    for counter in range(len(columnsWignerTransform)):
-        ray = columnsWignerTransform[counter]
-
+    for ray in columnsWignerTransform:
         orig = np.array([getY(getOrigin(ray)), getX(getOrigin(ray)), getZ(getOrigin(ray))], np.float_)
         dire = np.array([getY(getDirection(ray)), getX(getDirection(ray)), getZ(getDirection(ray))], np.float_)
         amp = np.array([getAmplitude(ray), 0, 0], np.float_)
+
         ray = np.array([orig, dire, amp], dtype=np.float_)
         updatedColumnsWignerTransform.append(ray)
 
@@ -101,9 +105,6 @@ def wigner_transform(lightSource, xVec, yVec):
         allRaysFromWigner.append(updatedColumnsWignerTransform[counter])
     #allRaysFromWigner.append(updatedColumnsWignerTransform)
 
-    nonZeroRays = List()
-    for ray in allRaysFromWigner:
-        if getAmplitude(ray) > 0:
-            nonZeroRays.append(ray)
+    nonZeroRays = [ray for ray in allRaysFromWigner if getAmplitude(ray) > 0]
 
     return nonZeroRays

@@ -13,11 +13,11 @@
 
   "mirrorErrorValue": 0.1,
   "lightSourceDensity": 11,
-  "mirrorGridDensity": 11,
+  "mirrorGridDensity": 10,
   "mirrorDimensions": 250,
-  "mirrorOffsetFromSource": 450,
+  "mirrorOffsetFromSource": 0,
 
-  "mirrorRotationAngle": 45,
+  "mirrorRotationAngle": 0,
   "mirrorRotationDirection": "y",
 
   "aWaveguideWidth":30,

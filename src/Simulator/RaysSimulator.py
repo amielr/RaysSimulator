@@ -14,17 +14,15 @@ with open('./config.json') as config_file:
 
 xVec, yVec, lightSource = generate_light_source()
 
-option = 'Amiel'
-
-if option == 'Amiel':
-    rays = wigner_transform(lightSource, xVec, yVec)
-else:
-    rays = michaelMain()
+rays = michaelMain()
+# rays = wigner_transform(lightSource, xVec, yVec)
 
 
 
 
 #plot_scatter(rays)
+
+rays = [ray for ray in rays if np.random.random() < 1000/len(rays)]
 
 rayList = np.array(rays)
 print("Our raylist size is: ", rayList.size)
@@ -55,15 +53,16 @@ def error_value_calc(screenRays):
 def simulate_mirror(mirrorCorrections, plot):
     mirrorBorders, mirrorInterpolatedBuilder = create_interpolated_mirror(mirrorCorrections)
 
-    #if plot:
-    #    plot_mirror(mirrorBorders, mirrorInterpolatedBuilder)
+    # if plot:
+    #     plot_mirror(mirrorBorders, mirrorInterpolatedBuilder)
 
     screenRays = ray_propogation(rayList,
                                  mirrorInterpolatedBuilder,
                                  mirrorBorders)
 
-    #if plot:
-    #    plot_heatmap(screenRays)
+    if plot:
+        plot_scatter(screenRays)
+        #plot_heatmap(screenRays)
 
 #    if plot:
 #        plot_wigner()

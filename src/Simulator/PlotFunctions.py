@@ -32,12 +32,12 @@ def plot_3d_to_2d(X, Y, Z):
 
 
 def plot_mirror(mirrorBorders, mirrorInterpolatedBuilder):
-    x_axis = np.arange(mirrorBorders[0], mirrorBorders[2], 1)
-    y_axis = np.arange(mirrorBorders[1], mirrorBorders[3], 1)
+    x_axis = np.arange(mirrorBorders[0], mirrorBorders[2], 10)
+    y_axis = np.arange(mirrorBorders[1], mirrorBorders[3], 10)
 
     X, Y = np.meshgrid(x_axis, y_axis)
 
-    Z = mirrorInterpolatedBuilder(X, Y)
+    Z = mirrorInterpolatedBuilder(x_axis, y_axis)
 
     plt.figure(1)
     plt.clf()
@@ -50,6 +50,7 @@ def plot_mirror(mirrorBorders, mirrorInterpolatedBuilder):
     plt.xlabel("x axis")
     plt.ylabel("y axis")
     plt.clabel("z axis")
+
     plt.show(block=False)
     plt.pause(1)
 
@@ -149,4 +150,8 @@ def plot_gridata(functiondata):
 
     plt.title('Linear')
     plt.imshow(grid_z1.T, extent=(0, 1, 0, 1), origin='lower')
+    plt.show()
+
+
+def plot_error_over_time(errors):
     plt.show()

@@ -2,6 +2,12 @@ import numpy as np
 from time import time
 import matplotlib.pyplot as plt
 from scipy.io import loadmat  # this is the SciPy module that loads mat-files
+import os
+
+
+
+
+
 
 def time_function(func):
     def wrapper():
@@ -36,6 +42,7 @@ def plot_3d_to_2d(X, Y, Z, name='Plot'):
 
 def Wigner_func_for_element(temp_data, name="name"):
     Nx, Ny = temp_data.shape
+    E = temp_data
     dx, dy = 1, 1  # step size in the x- and y- direction
     dkx = 2 * np.pi / (2 * Nx) / dx
     dky = 2 * np.pi / (2 * Ny) / dy
@@ -81,13 +88,18 @@ def Wigner_func_for_element(temp_data, name="name"):
 
 def Raybuilder(WignerMatrix):
     # rays = np.array((3, 3), complex)
+    WignerMatrix = WignerMatrix.real
+    shape = WignerMatrix.shape
+    Nx = shape[0]
+    Ny = shape[1]
+
     rayList = []
 
     xRange, yRange, resolution = 7.5, 5, 32
     dx = xRange / resolution
     dy = yRange / resolution
     dKx = 2 * np.pi / (2 * Nx) / dx
-    dKy = 2 * np.pi / (2 * Nx) / dx
+    dKy = 2 * np.pi / (2 * Nx) / dy
 
     for posX in range(Nx):
         for posY in range(Ny):
@@ -105,19 +117,31 @@ def Raybuilder(WignerMatrix):
 
 
 def michaelMain():
-    twodsquarewave1j = [[1, -1, 2, -1j, 1j],
+    twodsquarewaveComplex = np.array([[1, -1, 2, -1j, 1j],
                         [3, -3, 4, -3j, 3j],
                         [2, -2, 5, -2j, 1j],
                         [1, 2, 3, 4j, 5j],
-                        [1, 2, 3, 4j, 5j]]
+                        [1, 2, 3, 4j, 5j]])
 
-    ThzFieldData = loadmat('EqxtTHZField.mat')
+    twodsquarewavereal = np.array([[1, -1, 2, -1, 1],
+                        [3, -3, 4, -3, 3],
+                        [2, -2, 5, -2, 1],
+                        [1, 2, 3, 4, 5],
+                        [1, 2, 3, 4, 5]])
+
+    THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
+    my_file = os.path.join(THIS_FOLDER, 'EqxtTHZField.mat')
+
+
+    ThzFieldData = loadmat(my_file)
     ThzFieldData = ThzFieldData['Eqxt']
     E = ThzFieldData
     Nx, Ny = E.shape
     nx, ny = np.shape(E)
 
-    WignerField = Wigner_func_for_element(ThzFieldData, "Eqxt")
+    SampleData = twodsquarewavereal
+
+    WignerField = Wigner_func_for_element(SampleData, "Eqxt")
 
     TwoDRayPackage = Raybuilder(WignerField)
 

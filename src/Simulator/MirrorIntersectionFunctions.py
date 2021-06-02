@@ -30,7 +30,7 @@ def get_ray_mirror_intersection_point(wantedError, mirror_interp, ray):
     checkpointLocation = getOrigin(ray)
     xLocation = getX(checkpointLocation)
     yLocation = getY(checkpointLocation)
-    currentZ = mirror_interp(xLocation, yLocation)
+    currentZ = mirror_interp(xLocation, yLocation)[0]
     error = currentZ - getZ(checkpointLocation)
 
     while abs(error) > wantedError:
@@ -63,9 +63,9 @@ def generate_plane_normal(mirrorHitPoint, mirrorInterpolator):
     p3x = x - dx
     p3y = y - dy
 
-    p1z = mirrorInterpolator(p1x, p1y)  # get equivelant z points of interpelation points
-    p2z = mirrorInterpolator(p2x, p2y)
-    p3z = mirrorInterpolator(p3x, p3y)
+    p1z = mirrorInterpolator(p1x, p1y)[0]  # get equivelant z points of interpelation points
+    p2z = mirrorInterpolator(p2x, p2y)[0]
+    p3z = mirrorInterpolator(p3x, p3y)[0]
 
     p1 = np.array([p1x, p1y, p1z])
     p2 = np.array([p2x, p2y, p2z])
