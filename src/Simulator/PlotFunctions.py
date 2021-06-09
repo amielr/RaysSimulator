@@ -17,7 +17,6 @@ with open('./config.json') as config_file:
 
 matplotlib.use('TkAgg')
 
-
 def plot_3d_to_2d(X, Y, Z):
     ax = plt.axes(projection='3d')
 
@@ -56,10 +55,10 @@ def plot_mirror(mirrorBorders, mirrorInterpolatedBuilder):
 
 
 def plot_scatter(rays):
-
     raysY = []
     raysX = []
     raysZ = []
+
     for ray in rays:
         raysY.append(getY(getOrigin(ray)))
         raysX.append(getX(getOrigin(ray)))
@@ -74,9 +73,10 @@ def plot_scatter(rays):
 
     #ax.clf()
     ax.axis([min(raysY) - padding, max(raysY) + padding, min(raysX) - padding, max(raysX) + padding])
-    ax.scatter(raysY, raysX, raysZ, c='r', marker='o', s=[getAmplitude(ray) for ray in rays])
-    plt.show(block=False)
-    plt.pause(1)
+    #ax.scatter(raysY, raysX, raysZ, c='r', marker='o', s=[getAmplitude(ray) for ray in rays])
+    ax.scatter(raysY, raysX, raysZ, c='r', marker='.')
+
+    plt.show()
 
 def plot_heatmap(rays):
     #raysY = np.array([ray.getOrigin().getY() for ray in rays])
@@ -86,26 +86,29 @@ def plot_heatmap(rays):
     raysZ = np.array([getZ(getOrigin(ray)) for ray in rays])
 
 
-    padding = 5
+    padding = 1.3
 
     heatmap, xedges, yedges = np.histogram2d(raysY, raysZ, bins=50, weights=[getAmplitude(ray) for ray in rays])
     extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
 
     plt.figure(2)
     plt.clf()
-    plt.axis([raysY.min() - padding, raysY.max() + padding, raysZ.min() - padding, raysZ.max() + padding])
+
+    rngY = (raysY.max() - raysY.min()) * padding
+    cY = (raysY.max() + raysY.min()) / 2
+    minY,maxY =  cY - rngY/2,cY + rngY/2
+
+    rngZ = (raysZ.max() - raysZ.min()) * padding
+    cZ = (raysZ.max() + raysZ.min()) / 2
+    minZ,maxZ = cZ - rngZ/2,cZ + rngZ/2
+
+    plt.axis([minY,maxY, minZ,maxZ])
 
     plt.imshow(heatmap.T, extent=extent, origin='lower')
-    plt.show(block=False)
-    plt.pause(1)
+    plt.show()
 
 
 def plot_wigner(row, rays):
-
-
-    [ray for ray in rays]
-
-
     fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
 
     # Make data.
@@ -154,4 +157,9 @@ def plot_gridata(functiondata):
 
 
 def plot_error_over_time(errors):
+    y = errors
+    x = range(len(errors))
+
+    plt.plot(x, y)
     plt.show()
+

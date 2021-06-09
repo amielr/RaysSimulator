@@ -20,17 +20,25 @@ def startSimulation():
     print("Generation number: 0")
     print(best.get_fitness())
     print()
+    maxMutationRate = config["max_mutation_rate"]
+    minMutationRate = config["min_mutation_rate"]
+    generationMutationRelation = config["generation_mutation_relation"]
 
     while True:
         mirrors.simulate(index)
-        new_population = mirrors.next_generation()
+        if index < generationMutationRelation:
+            rate = maxMutationRate - index * (maxMutationRate - minMutationRate) / generationMutationRelation
+        else:
+            rate = minMutationRate
+        new_population = mirrors.next_generation(rate)
         mirrors.set_population(new_population)
 
         print("Generation number: " + str(index))
         print(mirrors.get_best().get_fitness())
-        # if (index % 10) == 0:
-        errors.append(mirrors.get_best().simulate(plot=True))
-        plot_error_over_time(errors)
+        err = mirrors.get_best().simulate(plot=(index % 100) == 0)
+        errors.append(err)
+        if index % 100 == 0:
+            plot_error_over_time(errors)
         print()
         index += 1
 

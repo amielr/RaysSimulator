@@ -31,14 +31,7 @@ def line_plane_collision(planeNormal, ray, epsilon=1e-6):
 
 # @njit(parallel=True)
 def build_intersections_with_mirror(rayList, mirrorInterpolator, mirrorBorders, errorValue):
-    #reflectedRayList = List()
     reflectedRayList = []
-    #for x in range(len(rayList)):
-    #    reflectedRayList.append(np.array([[origin], [direction], [amplitude]]))  #this could cause and error
-        # reflectedRayListnp
-    # print(rayList.size, "our raylist size")
-    # print(len(rayList))
-    # print(len(rayList[0]))
     for rayIndex in range(len(rayList)):
         ray = rayList[rayIndex]
         mirrorHitPoint = get_ray_mirror_intersection_point(errorValue, mirrorInterpolator, ray)
@@ -53,36 +46,26 @@ def build_intersections_with_mirror(rayList, mirrorInterpolator, mirrorBorders, 
     # plot_scatter(reflectedRayList)
 
     print("end mirror intersection")
-    print(len(reflectedRayList))
+    print("The number of reflected rays: " + str(len(reflectedRayList)))
 
     return reflectedRayList
 
 
-# @vectorize(['Ray(Ray)'], target='cuda')
-def intersect_with_mirror_parrallelly(ray, mirrorInterpolator, mirrorBorders, errorValue):
-    mirrorHitPoint = get_ray_mirror_intersection_point(errorValue, mirrorInterpolator, ray)
-
-    if is_ray_in_mirror_bounds(mirrorHitPoint, mirrorBorders):
-        reflectedRayDirection = get_reflected_ray_from_mirror(mirrorHitPoint, mirrorInterpolator, ray)
-        return np.array([mirrorHitPoint], [reflectedRayDirection], getAmplitude(ray))
-
-    return None
-
-
 #@njit(nogil=True)
 def build_intersections_with_screen(rayList, screenNormal):
-    raysAtScreenListHolder = np.zeros((3, 3), dtype=np.float_)
-    # for x in range(len(rayList)):
-    #    raysAtScreenList.append(np.array([origin], [direction], [amplitude]))
-    rayAtScreen = np.empty((3, 3), dtype=np.float_)
-    raysAtScreenList = np.dstack((raysAtScreenListHolder, rayAtScreen))
+    ray = rayList[0]
+    screenPoints = line_plane_collision(screenNormal, ray)
+    gottenDirection = ray[0] # getDirection(ray)
+    gottenAmplitude = ray[2][0] #getAmplitude(ray)
+    rayAtScreen = [screenPoints, gottenDirection, [gottenAmplitude, 0, 0]]
+    raysAtScreenList = np.expand_dims(rayAtScreen, 2)
 
-    for rayIndex in range(len(rayList)):
-        ray = rayList[rayIndex]
+    for rayIndex in range(len(rayList) - 1):
+        ray = rayList[rayIndex + 1]
         screenPoints = line_plane_collision(screenNormal, ray)
         gottenDirection = ray[0] # getDirection(ray)
         gottenAmplitude = ray[2][0] #getAmplitude(ray)
-        rayAtScreen[0], rayAtScreen[1], rayAtScreen[2] = screenPoints, gottenDirection, [gottenAmplitude, 0, 0]
+        rayAtScreen = [screenPoints, gottenDirection, [gottenAmplitude, 0, 0]]
         expandedRayAtScreen = np.expand_dims(rayAtScreen, 2)
         #print("our expandedRayAtScreen at screen are of shape", expandedRayAtScreen.shape, expandedRayAtScreen.dtype)
         #print("our rays at screen are of shape", rayAtScreen.shape, rayAtScreen.dtype)
@@ -96,7 +79,7 @@ def build_intersections_with_screen(rayList, screenNormal):
 def ray_propogation(rayList, mirrorInterpolator, mirrorBorders):
     reflectedRayList = build_intersections_with_mirror(rayList, mirrorInterpolator, mirrorBorders,
                                                        config["mirrorErrorValue"])
-    #plot_scatter(reflectedRayList)
+    # plot_scatter(reflectedRayList)
 
     reflectedRayListnp = np.array(reflectedRayList, dtype=np.float_)
 

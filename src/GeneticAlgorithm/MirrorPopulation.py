@@ -46,13 +46,13 @@ class MirrorPopulation:
 
         return self._population[selected_index]
 
-    def create_child(self):
+    def create_child(self,rate):
         parent1 = self.natural_select()
         parent2 = self.natural_select()
 
         dna = crossover(parent1.get_dna(), parent2.get_dna())
         child = MirrorCreature(dna)
-        child.mutate()
+        child.mutate(rate)
 
         return child
 
@@ -70,10 +70,10 @@ class MirrorPopulation:
         self._population = best_population
         self._best = best_population[0]
 
-    def next_generation(self):
+    def next_generation(self,rate):
         self.set_picked_probability()
 
-        new_population = [self.create_child() for x in range(config["population_size"])]
+        new_population = [self.create_child(rate) for x in range(config["population_size"])]
 
         return new_population
 

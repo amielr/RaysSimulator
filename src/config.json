@@ -1,7 +1,9 @@
 {
   "population_size": 100,
   "best_percent": 0.1,
-  "mutation_rate": 0.03,
+  "max_mutation_rate": 0.2,
+  "min_mutation_rate": 0.02,
+  "generation_mutation_relation": 150,
 
   "xScreenLocation": -200,
   "yScreenLocation": 0,
@@ -13,11 +15,11 @@
 
   "mirrorErrorValue": 0.1,
   "lightSourceDensity": 11,
-  "mirrorGridDensity": 10,
-  "mirrorDimensions": 250,
-  "mirrorOffsetFromSource": 0,
+  "mirrorGridDensity": 30,
+  "mirrorDimensions": 600,
+  "mirrorOffsetFromSource": 450,
 
-  "mirrorRotationAngle": 0,
+  "mirrorRotationAngle": -65,
   "mirrorRotationDirection": "y",
 
   "aWaveguideWidth":30,

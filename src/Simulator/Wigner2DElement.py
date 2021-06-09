@@ -3,10 +3,7 @@ from time import time
 import matplotlib.pyplot as plt
 from scipy.io import loadmat  # this is the SciPy module that loads mat-files
 import os
-
-
-
-
+from Simulator.PlotFunctions import plot_scatter, plot_3d_to_2d
 
 
 def time_function(func):
@@ -16,47 +13,23 @@ def time_function(func):
         print(f'{func.__name__} run time: {time() - start}')
     return wrapper
 
-def plot_3d_to_2d(X, Y, Z, name='Plot'):
-    # print("X=", X)
-    # print("Y=", Y)
-    # print("X \n", X)
-    X, Y = np.meshgrid(X, Y)
-    fig = plt.figure()
-    ax = plt.axes(projection='3d')
-
-    ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap='viridis', edgecolor='none')
-
-    ax.set_title(name)
-
-    plt.xlabel("x axis")
-    plt.ylabel("y axis")
-    plt.clabel("z axis")
-    # xv, yv = np.meshgrid(X, Y)
-    # plt.contour(xv, yv, Z, 100, cmap='viridis')
-    plt.show()
-    # plt.close(fig)
-    return
-
-
-
-
 def Wigner_func_for_element(temp_data, name="name"):
     Nx, Ny = temp_data.shape
     E = temp_data
     dx, dy = 1, 1  # step size in the x- and y- direction
-    dkx = 2 * np.pi / (2 * Nx) / dx
-    dky = 2 * np.pi / (2 * Ny) / dy
+    # dkx = 2 * np.pi / (2 * Nx) / dx
+    # dky = 2 * np.pi / (2 * Ny) / dy
     E_shift = np.zeros((Nx, Ny, 2 * Nx, 2 * Ny), dtype=complex)
-    W = np.zeros((Nx, Ny, 2 * Nx, 2 * Ny), dtype=complex)
+    # W = np.zeros((Nx, Ny, 2 * Nx, 2 * Ny), dtype=complex)
     Wig = np.zeros((Nx, Ny, 2 * Nx, 2 * Ny), dtype=complex)
-    A = np.zeros((2 * Nx, 2 * Ny))
-    B = np.zeros((2 * Nx, 2 * Ny), dtype=complex)
-    Nxs = np.linspace(-Nx, Nx, dx)
-    Nys = np.linspace(-Ny, Ny, dy)
+    # A = np.zeros((2 * Nx, 2 * Ny))
+    # B = np.zeros((2 * Nx, 2 * Ny), dtype=complex)
+    # Nxs = np.linspace(-Nx, Nx, dx)
+    # Nys = np.linspace(-Ny, Ny, dy)
     # Nxs = np.linspace(-0, 2*Nx, dx)
     # Nys = np.linspace(-0, 2*Ny, dy)
-    WigF = []
-    Etot = np.zeros((Nx, Ny, Nx, Ny), dtype=complex)
+    # WigF = []
+    # Etot = np.zeros((Nx, Ny, Nx, Ny), dtype=complex)
     for i in range(Nx):
         for j in range(Ny):
             for m in range(-Nx, Nx, dx):
@@ -73,15 +46,23 @@ def Wigner_func_for_element(temp_data, name="name"):
             # print("Exij[i, j] \n", Exij[i, j])
 
             fft_Et = np.fft.fftshift(np.fft.fft2(Exij[i, j]))
-            Wig[i, j, :, :] = fft_Et
+            #fft_Et[::2] = -fft_Et[::2]
+            #fft_Et = abs(fft_Et)
+            Wig[i, j, :, :] = abs(fft_Et)
             # print("Exij[i, j] SHAPE \n", fft_Et[i, j].shape)
             # Efft.append(fft_Et)
-            Kx = np.linspace(-Nx // 2, Nx // 2, Exij.shape[0])  # * dkx
-            Ky = np.linspace(-Ny // 2, Ny // 2, Exij.shape[1])  # * dky
-            Kx = np.linspace(-Nx, Nx, Exij[i, j].shape[0]) * dkx
-            Ky = np.linspace(-Ny, Ny, Exij[i, j].shape[1]) * dky
+            # Kx = np.linspace(-Nx // 2, Nx // 2, Exij.shape[0])  # * dkx
+            # Ky = np.linspace(-Ny // 2, Ny // 2, Exij.shape[1])  # * dky
+            # Kx = np.linspace(-Nx, Nx, Exij[i, j].shape[0]) * dkx
+            # Ky = np.linspace(-Ny, Ny, Exij[i, j].shape[1]) * dky
             # print("Exij.shape[0] :", Exij[i, j].shape[0])
-            fft_z = np.fft.fftshift(np.fft.fft2(Exij))
+            # fft_z = np.fft.fftshift(np.fft.fft2(Exij))
+
+            if (i == Nx/2 and j == Ny/2):
+                X, Y = np.meshgrid(np.linspace(-Nx, Nx, Exij[i, j].shape[0]), np.linspace(-Ny, Ny, Exij[i, j].shape[1]))
+                fft_Et[1::2] = -np.conj(fft_Et[1::2])
+                Z = abs(fft_Et)
+                plot_3d_to_2d(X, Y, Z)
 
     return Wig
 
@@ -92,27 +73,38 @@ def Raybuilder(WignerMatrix):
     shape = WignerMatrix.shape
     Nx = shape[0]
     Ny = shape[1]
+    xResolution = shape[0]
+    yResolution = shape[1]
 
     rayList = []
 
-    xRange, yRange, resolution = 7.5, 5, 32
-    dx = xRange / resolution
-    dy = yRange / resolution
-    dKx = 2 * np.pi / (2 * Nx) / dx
-    dKy = 2 * np.pi / (2 * Nx) / dy
-
+    xRange, yRange, resolution = 7.5, 5, 32   # resolution is not predefined
+    dx = xRange / Nx
+    dy = yRange / Ny
+    # dKx = 2 * np.pi / (2 * Nx) / dx
+    # dKy = 2 * np.pi / (2 * Ny) / dy
+    dKx = 0.5 / (2 * Nx)
+    dKy = 0.5 / (2 * Ny)
     for posX in range(Nx):
         for posY in range(Ny):
             for Kx in range(-Nx, Nx):
                 for Ky in range(-Ny, Ny):
                     if WignerMatrix[posX, posY, Kx, Ky] != 0:
                         origin = np.array(
-                            [-(0.5 * xRange) + posX * (xRange / resolution), -(0.5 * yRange) + posY * (yRange / resolution),
+                            #[posX * (xRange / resolution), posY * (yRange / resolution),0 ], dtype=np.float_)
+                            [-(0.5 * xRange) + posX * (xRange / xResolution), (0.5 * yRange) - posY * (yRange / yResolution),
                              0], dtype=np.float_)
+                        #direction = np.array([Kx, Ky , 1], dtype=np.float_)
                         direction = np.array([Kx * dKx, Ky * dKy, 1], dtype=np.float_)
+                        # direction = np.array([np.cos(Kx * dKx), np.sin(Ky * dKy), 1], dtype=np.float_)
+
+                        #direction = np.array([Kx * dx, Ky * Ky, 1], dtype=np.float_)
                         amplitude = np.array([WignerMatrix[posX, posY, Kx, Ky], 0, 0])
                         ray = np.array([origin, direction, amplitude])
                         rayList.append(ray)
+
+    # plot_scatter(rayList)
+
     return rayList
 
 
@@ -123,11 +115,33 @@ def michaelMain():
                         [1, 2, 3, 4j, 5j],
                         [1, 2, 3, 4j, 5j]])
 
-    twodsquarewavereal = np.array([[1, -1, 2, -1, 1],
-                        [3, -3, 4, -3, 3],
-                        [2, -2, 5, -2, 1],
-                        [1, 2, 3, 4, 5],
-                        [1, 2, 3, 4, 5]])
+    twodwavereal = np.array([[1, -1, 2, -1, 1],
+                                   [3, -3, 4, -3, 3],
+                                   [2, -2, 5, -2, 1],
+                                   [1, 2, 3, 4, 5],
+                                   [1, 2, 3, 4, 5]])
+
+    twodsquarewavereal = np.array([[0, 0, 0, 0, 0],
+                                   [0, 1, 1, 1, 0],
+                                   [0, 1, 1, 1, 0],
+                                   [0, 1, 1, 1, 0],
+                                   [0, 0, 0, 0, 0]])
+
+    twodsquarewavereal = np.array([[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                   [0, 0, 0, 1, 1, 1, 1, 0, 0, 0],
+                                   [0, 0, 0, 1, 1, 1, 1, 0, 0, 0],
+                                   [0, 0, 0, 1, 1, 1, 1, 0, 0, 0],
+                                   [0, 0, 0, 1, 1, 1, 1, 0, 0, 0],
+                                   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                                   [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
+
+
+
+
+
 
     THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
     my_file = os.path.join(THIS_FOLDER, 'EqxtTHZField.mat')

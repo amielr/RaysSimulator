@@ -8,7 +8,6 @@ with open('config.json') as config_file:
     config = json.load(config_file)
 
 mirrorGridDensity = config["mirrorGridDensity"]
-mutationRate = config["mutation_rate"]
 
 
 def random_integer():
@@ -35,11 +34,11 @@ class MirrorCreature:
         return self._dna
 
     def change_gene(self, index):
-        self._dna[index] += random_integer()
+        self._dna[index] += random_integer() * 3
 
-    def mutate(self):
+    def mutate(self,rate):
         for index, gene in enumerate(self._dna):
-            if random.random() < mutationRate:
+            if random.random() < rate:
                 self.change_gene(index)
 
     def set_picked_probability(self, probability):
