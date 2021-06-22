@@ -23,14 +23,14 @@ def generate_light_source():
     return xVec, yVec, pulse2d
 
 
-def create_interpolated_mirror(mirrorCorrections):
+def create_interpolated_mirror(mirrorCorrections, mirrorGridDensity, mirrorDimensions, mirrorOffsetFromSource, angle, direction):
     xMirrorScale = config["xMirrorScale"]
     yMirrorScale = config["yMirrorScale"]
-    mirrorGridDensity = config["mirrorGridDensity"]
-    mirrorDimensions = config["mirrorDimensions"]
-    mirrorOffsetFromSource = config["mirrorOffsetFromSource"]
-    angle = config["mirrorRotationAngle"]
-    direction = config["mirrorRotationDirection"]
+    # mirrorGridDensity = config["mirrorGridDensity"]
+    # mirrorDimensions = config["mirrorDimensions"]
+    # mirrorOffsetFromSource = config["mirrorOffsetFromSource"]
+    # angle = config["mirrorRotationAngle"]
+    # direction = config["mirrorRotationDirection"]
     korder = config["TaylorOrder"]
 
     axis, vertexDistance = np.linspace(-mirrorDimensions, mirrorDimensions, mirrorGridDensity, endpoint=False,retstep=True)

@@ -1,9 +1,11 @@
 import numpy as np
+from numpy import genfromtxt
 from time import time
 import matplotlib.pyplot as plt
 from scipy.io import loadmat  # this is the SciPy module that loads mat-files
 import os
-from Simulator.PlotFunctions import plot_scatter, plot_3d_to_2d
+from Simulator.PlotFunctions import plot_scatter, plot_3d_to_2d, plot_heatmap, plot_3dheatmap
+from Simulator.RayPropogation import propogate_rays_in_free_space
 
 
 def time_function(func):
@@ -12,6 +14,15 @@ def time_function(func):
         func()
         print(f'{func.__name__} run time: {time() - start}')
     return wrapper
+
+
+def rotate_180(array, M, N, out):
+    M = array.shape[0]
+    N = array.shape[1]
+    for i in range(M):
+        for j in range(N):
+            out[i, N-1-j] = array[M-1-i, j]
+
 
 def Wigner_func_for_element(temp_data, name="name"):
     Nx, Ny = temp_data.shape
@@ -39,13 +50,17 @@ def Wigner_func_for_element(temp_data, name="name"):
                         # A[m + Nx, n + Ny] = E[i + m, j + n] * np.conj(E[i - m, j - n]) # modified coorr matrix
                         # print("A[m+Nx,n+Ny]=",A[m+Nx,n+Ny], "i=", i, "j=", j, "m=", m, "n=", n,  m + Nx,  n + Ny)
                         E_shift[i, j, m + Nx, n + Ny] = E[i + m, j + n] * np.conj(E[i - m, j - n])
+                        #ERotated = rotate_180(E_shift)
+                        # E_shift = E_shift
                         # print("E_shift[i,j,m+Nx,n+Ny]=", E_shift[i, j, m + Nx, n + Ny], "                  i=", i, "j=", j, "m=", m, "n=", n)
             # print("E_shift[i,j]=\n", E_shift[i, j])
             Exij = E_shift
             # Exij[i,j,:,:] = E_shift
             # print("Exij[i, j] \n", Exij[i, j])
 
-            fft_Et = np.fft.fftshift(np.fft.fft2(Exij[i, j]))
+            #fft_Et = np.fft.fftshift(np.fft.fft2(Exij[i, j]))
+            fft_Et = (np.fft.fft2(Exij[i, j]))
+
             #fft_Et[::2] = -fft_Et[::2]
             #fft_Et = abs(fft_Et)
             Wig[i, j, :, :] = abs(fft_Et)
@@ -58,11 +73,12 @@ def Wigner_func_for_element(temp_data, name="name"):
             # print("Exij.shape[0] :", Exij[i, j].shape[0])
             # fft_z = np.fft.fftshift(np.fft.fft2(Exij))
 
-            if (i == Nx/2 and j == Ny/2):
-                X, Y = np.meshgrid(np.linspace(-Nx, Nx, Exij[i, j].shape[0]), np.linspace(-Ny, Ny, Exij[i, j].shape[1]))
-                fft_Et[1::2] = -np.conj(fft_Et[1::2])
-                Z = abs(fft_Et)
-                plot_3d_to_2d(X, Y, Z)
+            # if (i == int(Nx/2) and j == int(Ny/2)):
+            #     X, Y = np.meshgrid(np.linspace(-Nx, Nx, Exij[i, j].shape[0]), np.linspace(-Ny, Ny, Exij[i, j].shape[1]))
+            #     fft_Et[1::2] = -np.conj(fft_Et[1::2])
+            #     fft_Et = np.fft.fftshift(fft_Et)
+            #     Z = abs(fft_Et)
+            #     plot_3d_to_2d(X, Y, Z)
 
     return Wig
 
@@ -83,8 +99,12 @@ def Raybuilder(WignerMatrix):
     dy = yRange / Ny
     # dKx = 2 * np.pi / (2 * Nx) / dx
     # dKy = 2 * np.pi / (2 * Ny) / dy
-    dKx = 0.5 / (2 * Nx)
-    dKy = 0.5 / (2 * Ny)
+    # dKx = 0.5 / (2 * Nx)
+    # dKy = 0.5 / (2 * Ny)
+    rng = 2*Nx
+    dKx = 0.033/rng
+    #dKy = 0.046
+    dKy = 0.033/rng
     for posX in range(Nx):
         for posY in range(Ny):
             for Kx in range(-Nx, Nx):
@@ -140,16 +160,17 @@ def michaelMain():
 
 
 
-
-
-
     THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
     my_file = os.path.join(THIS_FOLDER, 'EqxtTHZField.mat')
+    my_CSV_file = os.path.join(THIS_FOLDER, 'Eqxtcsv.csv')
 
 
     ThzFieldData = loadmat(my_file)
-    ThzFieldData = ThzFieldData['Eqxt']
-    E = ThzFieldData
+    # ThzFieldData = ThzFieldData['Eqxt']
+
+    my_CSV_data = genfromtxt(my_CSV_file, dtype=complex, delimiter=',')
+
+    E = my_CSV_data
     Nx, Ny = E.shape
     nx, ny = np.shape(E)
 
@@ -158,6 +179,19 @@ def michaelMain():
     WignerField = Wigner_func_for_element(SampleData, "Eqxt")
 
     TwoDRayPackage = Raybuilder(WignerField)
+    # plot_scatter(TwoDRayPackage)
+    # plot_3dheatmap(TwoDRayPackage)
+    plot_heatmap(TwoDRayPackage, 'z')
+
+    # TwoDRayPackage = propogate_rays_in_free_space(TwoDRayPackage, 450)
+    # plot_heatmap(TwoDRayPackage)
+
+    # for i in range(3):
+    #     TwoDRayPackage = propogate_rays_in_free_space(TwoDRayPackage, 400)
+    #     plot_heatmap(TwoDRayPackage, 'z')
+    #     plot_3dheatmap(TwoDRayPackage)
+    #     plot_scatter(TwoDRayPackage)
+
 
     return TwoDRayPackage
 

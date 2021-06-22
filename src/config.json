@@ -3,11 +3,11 @@
   "best_percent": 0.1,
   "max_mutation_rate": 0.2,
   "min_mutation_rate": 0.02,
-  "generation_mutation_relation": 150,
+  "generation_mutation_relation": 600,
 
   "xScreenLocation": -200,
   "yScreenLocation": 0,
-  "zScreenLocation": 450,
+  "zScreenLocation": 1300,
 
   "xMirrorScale": -22.5,
   "yMirrorScale": -22.5,
@@ -15,9 +15,9 @@
 
   "mirrorErrorValue": 0.1,
   "lightSourceDensity": 11,
-  "mirrorGridDensity": 30,
+  "mirrorGridDensity": 15,
   "mirrorDimensions": 600,
-  "mirrorOffsetFromSource": 450,
+  "mirrorOffsetFromSource": 1300,
 
   "mirrorRotationAngle": -65,
   "mirrorRotationDirection": "y",

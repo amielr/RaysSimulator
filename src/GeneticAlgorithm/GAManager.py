@@ -16,7 +16,7 @@ def startSimulation():
     index = 1
 
     best = MirrorCreature([0 for _ in np.zeros([mirrorGridDensity**2])])
-    errors.append(best.simulate(plot=True))
+    errors.append(best.simulate_single_mirror(plot=True))
     print("Generation number: 0")
     print(best.get_fitness())
     print()
@@ -25,7 +25,10 @@ def startSimulation():
     generationMutationRelation = config["generation_mutation_relation"]
 
     while True:
-        mirrors.simulate(index)
+        # simulate all of the mirrors
+        mirrors.simulate_generation(index)
+
+        # regenerate the mirrors
         if index < generationMutationRelation:
             rate = maxMutationRate - index * (maxMutationRate - minMutationRate) / generationMutationRelation
         else:
@@ -33,11 +36,12 @@ def startSimulation():
         new_population = mirrors.next_generation(rate)
         mirrors.set_population(new_population)
 
+        # summarize the result of this generation
         print("Generation number: " + str(index))
         print(mirrors.get_best().get_fitness())
-        err = mirrors.get_best().simulate(plot=(index % 100) == 0)
+        err = mirrors.get_best().simulate_single_mirror(plot=(index % 50) == 0)
         errors.append(err)
-        if index % 100 == 0:
+        if index % 50 == 0:
             plot_error_over_time(errors)
         print()
         index += 1

@@ -17,19 +17,20 @@ xVec, yVec, lightSource = generate_light_source()
 rays = michaelMain()
 # rays = wigner_transform(lightSource, xVec, yVec)
 
-plot_scatter(rays)
+# plot_scatter(rays)
 
 def getStochasticRaysList(rays):
     stochasticRaysSelection = [ray for ray in rays if np.random.random() < 100 / len(rays)]
     npArrayStochasticRays = np.array(stochasticRaysSelection)
     return npArrayStochasticRays
 
+
 def getHighestAmplitudeList(rays):
     highestRayList = np.array(rays)
     sortedList = np.argsort(highestRayList)[-100:][::-1]
     return sortedList
 
-sortedList = getHighestAmplitudeList(rays)
+#sortedList = getHighestAmplitudeList(rays)
 
 stochasticRayList = getStochasticRaysList(rays)
 
@@ -66,27 +67,49 @@ def error_value_calc(screenRays):
     return variance + meanDistance
 
 
-def simulate_mirror(mirrorCorrections, plot):
-    mirrorBorders, mirrorInterpolatedBuilder = create_interpolated_mirror(mirrorCorrections)
+def simulate_mirror(mirrorCorrections, plot, stochasticFlag):
+    # mirrorGridDensity = config["mirrorGridDensity"]
+    # mirrorDimensions = config["mirrorDimensions"]
+    # mirrorOffsetFromSource = config["mirrorOffsetFromSource"]
+    # angle = config["mirrorRotationAngle"]
+    # direction = config["mirrorRotationDirection"]
 
+    mirrorBorders, mirrorInterpolatedBuilder = create_interpolated_mirror(mirrorCorrections, config["mirrorGridDensity"],
+                                                                          config["mirrorDimensions"], config["mirrorOffsetFromSource"],
+                                                                          config["mirrorRotationAngle"], config["mirrorRotationDirection"])
 
+    if stochasticFlag:
+        global stochasticRayList
+        stochasticRayList = getStochasticRaysList(rays)
+        print("the stochastic raylist length is: ", str(len(stochasticRayList)))
+
+    counter = 0
     if plot:
-        plot_mirror(mirrorBorders, mirrorInterpolatedBuilder)
+        # plot_mirror(mirrorBorders, mirrorInterpolatedBuilder)
+        mirrorBorders, mirrorInterpolatedBuilderZeroed = create_interpolated_mirror(mirrorCorrections,
+                                                                              config["mirrorGridDensity"],
+                                                                              config["mirrorDimensions"],
+                                                                              0, 0,
+                                                                              config["mirrorRotationDirection"])
+        plot_mirror(mirrorBorders, mirrorInterpolatedBuilderZeroed)
+
         #rayList = np.array(rays)
         fullRayList = getFullRayList(rays)
         print("the full raylist length is: ", str(len(fullRayList)))
+        #screenRays = ray_propogation(fullRayList,
+        #                             mirrorInterpolatedBuilder,
+        #                             mirrorBorders)
         screenRays = ray_propogation(fullRayList,
                                      mirrorInterpolatedBuilder,
                                      mirrorBorders)
         x=0
     else:
-        print("the stochastic raylist length is: ", str(len(stochasticRayList)))
-        screenRays = ray_propogation(stochasticRayList,
-                                 mirrorInterpolatedBuilder,
-                                 mirrorBorders)
+        screenRays = ray_propogation(stochasticRayList, mirrorInterpolatedBuilder, mirrorBorders)
+
 
     if plot:
-        plot_heatmap(screenRays)
+        plot_heatmap(screenRays, 'x')
+        #plot_3dheatmap(screenRays)
 
 #    if plot:
 #        plot_wigner()

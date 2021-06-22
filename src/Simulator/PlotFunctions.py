@@ -51,7 +51,7 @@ def plot_mirror(mirrorBorders, mirrorInterpolatedBuilder):
     plt.clabel("z axis")
 
     plt.show(block=False)
-    plt.pause(1)
+    #plt.pause(1)
 
 
 def plot_scatter(rays):
@@ -78,32 +78,104 @@ def plot_scatter(rays):
 
     plt.show()
 
-def plot_heatmap(rays):
+
+def plot_3dheatmap(rays):
+    fig, ax = plt.subplots(subplot_kw={"projection": "3d"})
+
+    # Make data.
+    raysYY = []
+    raysXX = []
+    raysZZ = []
+    amp = []
+    # raysY = np.array([ray.getOrigin().getY() for ray in rays])
+    # raysY = np.array([getY(getOrigin(ray)) for ray in rays])
+
+    # raysZ = np.array([ray.getOrigin().getZ() for ray in rays])
+    # raysZ = np.array([getZ(getOrigin(ray)) for ray in rays])
+    for ray in rays:
+        raysYY.append(getY(getOrigin(ray)))
+        raysXX.append(getX(getOrigin(ray)))
+        raysZZ.append(getZ(getOrigin(ray)))
+        amp.append(getAmplitude(ray))
+
+
+    raysX = np.array(raysXX)
+    raysY = np.array(raysYY)
+    raysZ = np.array(raysZZ)
+    npAmp = np.array(amp)
+
+    fig = plt.figure()
+    ax = plt.axes(projection='3d')
+
+    # Plot the surface.
+    surf = ax.plot_trisurf(raysX, raysY, npAmp, cmap=cm.coolwarm,
+                           linewidth=0, antialiased=False)
+
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.set_zlabel('z')
+
+    # Customize the z axis.
+    ax.set_zlim(-1.01, 1.01)
+    ax.zaxis.set_major_locator(LinearLocator(10))
+    # A StrMethodFormatter is used automatically
+    ax.zaxis.set_major_formatter('{x:.02f}')
+
+    # Add a color bar which maps values to colors.
+    fig.colorbar(surf, shrink=0.5, aspect=5)
+
+    plt.show()
+
+
+def plot_heatmap(rays, direction):
+    raysYY = []
+    raysXX = []
+    raysZZ = []
+
     #raysY = np.array([ray.getOrigin().getY() for ray in rays])
-    raysY = np.array([getY(getOrigin(ray)) for ray in rays])
+    #raysY = np.array([getY(getOrigin(ray)) for ray in rays])
 
     #raysZ = np.array([ray.getOrigin().getZ() for ray in rays])
-    raysZ = np.array([getZ(getOrigin(ray)) for ray in rays])
+    #raysZ = np.array([getZ(getOrigin(ray)) for ray in rays])
+    for ray in rays:
+        raysYY.append(getY(getOrigin(ray)))
+        raysXX.append(getX(getOrigin(ray)))
+        raysZZ.append(getZ(getOrigin(ray)))
 
-
+    raysX = np.array(raysXX)
+    raysY = np.array(raysYY)
+    raysZ = np.array(raysZZ)
     padding = 1.3
-
-    heatmap, xedges, yedges = np.histogram2d(raysY, raysZ, bins=50, weights=[getAmplitude(ray) for ray in rays])
-    extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
-
-    plt.figure(2)
-    plt.clf()
 
     rngY = (raysY.max() - raysY.min()) * padding
     cY = (raysY.max() + raysY.min()) / 2
-    minY,maxY =  cY - rngY/2,cY + rngY/2
+    minY, maxY = cY - rngY / 2, cY + rngY / 2
 
     rngZ = (raysZ.max() - raysZ.min()) * padding
     cZ = (raysZ.max() + raysZ.min()) / 2
-    minZ,maxZ = cZ - rngZ/2,cZ + rngZ/2
+    minZ, maxZ = cZ - rngZ / 2, cZ + rngZ / 2
 
-    plt.axis([minY,maxY, minZ,maxZ])
+    rngX = (raysX.max() - raysX.min()) * padding
+    cX = (raysX.max() + raysX.min()) / 2
+    minX, maxX = cX - rngX / 2, cX + rngX / 2
 
+
+
+    if direction == 'z':
+        heatmap, xedges, yedges = np.histogram2d(raysX, raysY, bins=50, weights=[getAmplitude(ray) for ray in rays])
+        extent = [xedges[0], xedges[-1], yedges[0], yedges[-1]]
+        plt.axis([minX, maxX, minY, maxY])
+    elif direction =='x':
+        heatmap, zedges, yedges = np.histogram2d(raysZ, raysY, bins=50, weights=[getAmplitude(ray) for ray in rays])
+        extent = [zedges[0], zedges[-1], yedges[0], yedges[-1]]
+        plt.axis([minZ, maxZ, minY, maxY])
+    else:
+        heatmap, zedges, xedges = np.histogram2d(raysZ, raysX, bins=50, weights=[getAmplitude(ray) for ray in rays])
+        extent = [zedges[0], zedges[-1], xedges[0], xedges[-1]]
+        plt.axis([minZ, maxZ, minX, maxX])
+
+    #plt.figure(2)
+    plt.clf()
     plt.imshow(heatmap.T, extent=extent, origin='lower')
     plt.show()
 
@@ -161,5 +233,6 @@ def plot_error_over_time(errors):
     x = range(len(errors))
 
     plt.plot(x, y)
+    plt.yscale("log")
     plt.show()
 

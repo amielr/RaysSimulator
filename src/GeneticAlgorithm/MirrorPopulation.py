@@ -28,11 +28,15 @@ class MirrorPopulation:
     def __init__(self):
         self._population = [MirrorCreature() for xrefle in range(config["population_size"])]
 
-    def simulate(self, generationNum):
+    def simulate_generation(self, generationNum):
+        stochasticFl = True
+
         for index, mirror in enumerate(self._population):
             # print("Mirror #"+str(index))
-            mirror.simulate()
+
+            mirror.simulate_single_mirror(stochasticFlag=stochasticFl)
             print("Generation Number", generationNum, "Mirror: ", str(index) + " : " + str(mirror.get_fitness()))
+            stochasticFl = False
 
     def get_best(self):
         return self._best

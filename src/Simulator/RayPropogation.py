@@ -76,6 +76,16 @@ def build_intersections_with_screen(rayList, screenNormal):
     return raysAtScreenList
 
 
+def propRays(ray, distance):
+    newRay = ray
+    newRay[0] = getOrigin(ray) + getDirection(ray)*distance
+    return newRay
+
+def propogate_rays_in_free_space(rayList, distance):
+    propogatedRays = [propRays(ray, distance) for ray in rayList]
+    return propogatedRays
+
+
 def ray_propogation(rayList, mirrorInterpolator, mirrorBorders):
     reflectedRayList = build_intersections_with_mirror(rayList, mirrorInterpolator, mirrorBorders,
                                                        config["mirrorErrorValue"])
